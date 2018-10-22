@@ -28,6 +28,53 @@ If you find PhotoShape useful, please consider citing:
 We try to provide everything required to get up and running, but due to licensing and copyright restrictions 
 you will have to download/purchase some data directly from the source.
 
+### Python Environment
+
+I recommend pyenv for managing python environments, but anything should work.
+
+```bash
+# Install pyenv
+curl -L https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer | bash
+pyenv update
+
+# Install dependencies and python
+sudo apt-get install -y make build-essential libssl-dev zlib1g-dev libbz2-dev \
+libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev \
+xz-utils tk-dev libffi-dev liblzma-dev
+pyenv install 3.7.0
+pyenv virtualenv 3.7.0 photoshape
+pyenv activate photoshape
+```
+
+### Install Dependencies
+
+If you just need to use the network, all you'll need is the basic dependencies.
+
+```bash
+pip install torch torchvision
+pip install -r requirements.txt
+```
+
+If you want to run code that requires the dense CRF implementation, you'll need to install that package. This includes the
+fine alignment step and the substance segmentation for exemplars.
+
+```bash
+# For dense CRF (needed for substance segmentation).
+pip install git+https://github.com/lucasb-eyer/pydensecrf.git
+```
+
+Unfortunately our code for rendering segments and alignment renderings involves some custom shaders with vispy. This can be 
+finnicky to set up. You'll need to install the following fork of PyOpenGL which supports NVIDIA extensions.
+
+```bash
+# For custom shader support (needed for rendering certain stuff in pipeline)
+pip install git+https://github.com/mcfletch/pyopengl.git
+```
+
+Please create an issue if something doesn't work as expected and I'll try to address it.
+
+### Installation
+
 First we have to fetch this codebase.
 
 ```bash
