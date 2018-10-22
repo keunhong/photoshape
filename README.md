@@ -120,6 +120,15 @@ Data directories and paths are defined in `src/terial/config.py`. Modify the dir
 correct location on your disk(s). We've created a basic skeleton of the directory structure in `data`. 
 
 
+### Blender Module
+
+We use Blender for shape processing and rendering. Unfortunately installing Blender as a Python module is a pretty involved
+process. Follow directions [here](https://gist.github.com/keunhong/279c98de28877a3a33a1eb95fa7d56a5).
+
+There also seems to be some effort to have this prepackaged at https://pypi.org/project/bpy/ but I cannot
+guarantee that it will work. 
+
+
 ## Data Sets
 
 Blob data associated with rows in the database are stores in a blobs directory. This directory can be configured in 
