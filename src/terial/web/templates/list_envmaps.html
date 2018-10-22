@@ -1,0 +1,103 @@
+{% extends 'layout.html' %}
+
+{% block title %}Environment Maps{% endblock %}
+
+{% block head %}
+  <style type="text/css">
+    .envmap-preview {
+      width: 300px;
+    }
+
+    .envmap-card {
+      margin: 5px;
+      overflow: hidden;
+    }
+
+    .envmap-card img {
+      width: 200px;
+    }
+
+    .envmap-card h5 {
+      font-size: 14px;
+    }
+
+    .envmap-card h6 {
+      font-size: 14px;
+      color: #777;
+    }
+
+    .envmap-card .card-body {
+      padding: 5px;
+    }
+
+    .envmap-card .card-text {
+      margin-top: 7px;
+    }
+
+    .envmap-card table {
+      font-size: 12px;
+      width: 100%;
+    }
+
+    .envmap-card table td {
+      overflow-x: auto;
+      vertical-align: middle;
+    }
+
+    .envmaps-wrapper {
+      text-align: center;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .wrapper {
+      padding-top: 20px;
+      width: 95vw;
+      margin: 0 auto;
+      text-align: center;
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <div class="wrapper">
+    <div class="envmaps-wrapper">
+      {% for envmap in envmaps %}
+        <div class="card envmap-card {{ '' if envmap.enabled else 'card-disabled'}}">
+        <a href="{{ nginx_url(envmap.get_data_path('preview.png')) }}" data-toggle="lightbox">
+          <img class="card-img-top envmap-preview"
+               src="{{ nginx_url(envmap.get_data_path('preview.png')) }}" />
+        </a>
+        <div class="card-body">
+          <h5 class="card-title">{{ envmap.id }}</h5>
+          <h6 class="card-subtitle">{{ envmap.name }}</h6>
+          <div class="card-text">
+            <table class="table table-bordered table-sm">
+              <tbody>
+                <tr>
+                  <th>Enabled</th>
+                  <td>{{ envmap.enabled }}</td>
+                </tr>
+                <tr>
+                  <th>Azimuth</th>
+                  <td>{{ envmap.azimuth }}</td>
+                </tr>
+                <tr>
+                  <th>Source</th>
+                  <td>{{ envmap.source }}</td>
+                </tr>
+                <tr>
+                  <th>Split Set</th>
+                  <td>{{ envmap.split_set }}</td>
+                </tr>
+              </tbody>
+
+            </table>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+{% endblock %}

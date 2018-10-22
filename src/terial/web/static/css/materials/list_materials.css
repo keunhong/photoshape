@@ -1,0 +1,59 @@
+.wrapper {
+    padding-top: 20px;
+    width: 95vw;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.controls-wrapper {
+    text-align: center;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.materials-wrapper {
+    text-align: center;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.materials-card {
+    margin: 5px;
+    width: 200px;
+    overflow: hidden;
+}
+
+.materials-card img {
+    width: 200px;
+}
+
+.materials-card h5 {
+    font-size: 14px;
+}
+
+.materials-card h6 {
+    font-size: 14px;
+    color: #777;
+}
+
+.materials-card .card-body {
+    padding: 5px;
+}
+
+.materials-card .card-text {
+    margin-top: 7px;
+}
+
+.materials-card table {
+    font-size: 12px;
+    width: 100%;
+    table-layout: fixed;
+}
+
+.materials-card table td {
+    overflow-x: auto;
+    vertical-align: middle;
+}
+

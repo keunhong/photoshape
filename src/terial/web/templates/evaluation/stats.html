@@ -1,0 +1,44 @@
+{% extends 'evaluation/layout.html' %}
+
+{% block title %}Evaluation Stats{% endblock %}
+
+{% import "macros.html" as macros %}
+
+{% block head %}
+  <style type="text/css">
+    .wrapper {
+      padding-top: 20px;
+      width: 95vw;
+    }
+
+
+  </style>
+{% endblock %}
+
+{% block content %}
+  <div class="wrapper">
+    <div id="result-div">
+
+      <h2>Shape Stats</h2>
+      <p>Total Labeled: {{ shape_quality_total }}</p>
+      <ul>
+        {% for quality in ResultQuality %}
+          {% set count = shape_quality_counts.get(quality, 0) %}
+          <li>{{ quality.name }}: {{ count }} ({{ '{:.02f}%'.format(100 * count / shape_quality_total) }})</li>
+        {% endfor %}
+      </ul>
+
+      <h2>Pair Stats</h2>
+      <p>Total Labeled: {{ pair_quality_total }}</p>
+      <ul>
+        {% for quality in ResultQuality %}
+          {% set count = pair_quality_counts.get(quality, 0) %}
+          <li>{{ quality.name }}: {{ count }} ({{ '{:.02f}%'.format(100 * count / pair_quality_total) }})</li>
+        {% endfor %}
+      </ul>
+
+    </div>
+
+  </div>
+
+{% endblock %}

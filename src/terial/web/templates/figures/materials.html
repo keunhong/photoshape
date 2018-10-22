@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Materials Figure | Terial</title>
+  <style>
+    body {
+      font-size: 0;
+    }
+    img {
+      width: 50px;
+      padding: 0
+    }
+  </style>
+</head>
+<body>
+
+
+{% for material in materials %}
+  <img class="card-img-top"
+       src="{{ nginx_url(material.get_data_path('previews/bmps.png')) }}" />
+{% endfor %}
+
+</body>
+</html>

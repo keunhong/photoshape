@@ -1,0 +1,53 @@
+{% extends 'layout.html' %}
+{% import "macros.html" as macros %}
+
+{% block title %}Exemplars{% endblock %}
+
+{% block head %}
+
+  <link rel="stylesheet" href="{{ static('css/exemplars/list_exemplars.css') }}" />
+  <script src="{{ static('js/exemplars/exemplars.js') }}"></script>
+  <script src="{{ static('js/exemplars/list_exemplars.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+  <div class="wrapper">
+
+    <p>Showing {{ exemplars|length }} of {{ n_total }} exemplars.</p>
+
+      {{ macros.pagination_bar(cur_page, n_pages, 'exemplar_list', page_size=page_size,
+                               n_display=10, query=query) }}
+
+    <div class="renderings-wrapper">
+      {% for exemplar in exemplars %}
+        <div class="card rendering-div">
+          <a href="{{ nginx_url(exemplar.cropped_path) }}" data-toggle="lightbox">
+            <img class="card-img-top" src="{{ nginx_url(exemplar.cropped_path) }}"/>
+          </a>
+          <a href="{{ nginx_url(exemplar.get_data_path('substance_map_minc_vgg16.vis.v2.png')) }}" data-toggle="lightbox">
+            <img class="card-img-top" src="{{ nginx_url(exemplar.get_data_path('substance_map_minc_vgg16.vis.v2.png')) }}"/>
+          </a>
+          <a href="{{ nginx_url(exemplar.get_data_path('substance_map_minc_vgg16.vis.png')) }}" data-toggle="lightbox">
+            <img class="card-img-top" src="{{ nginx_url(exemplar.get_data_path('substance_map_minc_vgg16.vis.png')) }}"/>
+          </a>
+          <div class="card-body">
+            <h5 class="card-title">{{ exemplar.id }}</h5>
+            <p class="card-text">
+              <label for="exemplar-exclude-checkbox-{{ exemplar.id }}">Exclude</label>
+              <input type="checkbox"
+                     id="exemplar-exclude-checkbox-{{ exemplar.id }}"
+                     class="exemplar-exclude-checkbox"
+                     data-exemplar-id="{{ exemplar.id }}"
+                     {{ 'checked' if exemplar.exclude else '' }} />
+            </p>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    {{ macros.pagination_bar(cur_page, n_pages, 'exemplar_list', page_size=page_size,
+                               n_display=10, query=query) }}
+
+  </div>
+
+{% endblock %}

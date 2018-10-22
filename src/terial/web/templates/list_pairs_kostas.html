@@ -1,0 +1,154 @@
+{% extends 'layout.html' %}
+
+{% block title %}Pairs (Extra){% endblock %}
+
+{% import "macros.html" as macros %}
+
+{% block head %}
+  <link rel="stylesheet" href="{{ static('css/pairs/list_pairs.css') }}"/>
+  <script src="{{ static('js/shapes/shapes.js') }}"></script>
+  <script src="{{ static('js/exemplars/exemplars.js') }}"></script>
+  <script src="{{ static('js/pairs/list_pairs.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+  <div class="wrapper">
+
+    {% if error %}
+      <h1>Error</h1>
+      <p>{{ error }}</p>
+    {% else %}
+      <p>Showing {{ pairs|length }} of {{ n_total }}</p>
+
+      {{ macros.pagination_bar(cur_page, n_pages, 'pair_list_kostas',
+                               page_size=page_size, n_display=10,
+                               query=request.query) }}
+
+      <table class="table table-sm pairs-table">
+        <thead class="thead-dark">
+        <tr>
+          <th>Pair ID</th>
+          <th>Split Set</th>
+          <th>Align Dist</th>
+          <th>Shape</th>
+          <th>Exemplar</th>
+          <th>Segments</th>
+          <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for pair in pairs %}
+          <tr>
+            <td>{{ pair.id }}</td>
+            <td>{{ pair.shape.split_set }}</td>
+            <td>{{ '{:.02f}'.format(pair.distance) }}</td>
+            <td class="exemplar-td">
+              {% if pair.data_exists(config.SHAPE_REND_PHONG_NAME) %}
+                <img src="{{ nginx_url(pair.get_data_path(config.SHAPE_REND_PHONG_NAME)) }}">
+              {% else %}
+                <img src="{{ nginx_url(pair.shape.get_data_path(config.SHAPE_REND_PHONG_NAME)) }}">
+                <p class="small">(no pair rend)</p>
+              {% endif %}
+              {{ pair.shape.id }}
+              <p>
+                <label for="shape-exclude-checkbox-{{ pair.shape.id }}">
+                  <small>Exclude</small>
+                </label>
+                <input type="checkbox"
+                       id="shape-exclude-checkbox-{{ pair.shape.id }}"
+                       data-shape-id="{{ pair.shape.id }}"
+                       autocomplete="off"
+                       class="shape-exclude-checkbox"
+                    {{ 'checked' if pair.shape.exclude else '' }}/>
+              </p>
+            </td>
+            <td class="exemplar-td">
+              <img src="{{ nginx_url(pair.exemplar.cropped_path) }}">
+              {{ pair.exemplar.id }}
+              <p>
+                <label for="exemplar-exclude-checkbox-{{ pair.exemplar.id }}">
+                  <small>Exclude</small>
+                </label>
+                <input type="checkbox"
+                       id="exemplar-exclude-checkbox-{{ pair.exemplar.id }}"
+                       data-exemplar-id="{{ pair.exemplar.id }}"
+                       autocomplete="off"
+                       class="exemplar-exclude-checkbox"
+                    {{ 'checked' if pair.exemplar.exclude else '' }}/>
+              </p>
+            </td>
+            <td class="exemplar-td">
+
+              <table class="segment-table table table-sm">
+                <thead class="thead-light">
+                <tr>
+                  <th>Normals</th>
+                  <th>Material IDs (Shape)</th>
+                  <th>Material IDs (Ours)</th>
+                  <th>Foreground Mask</th>
+                </tr>
+                </thead>
+                <tr>
+                  <td>
+                    <img class="overlay-img" src="{{ nginx_url(pair.get_data_path(config.SHAPE_REND_NORMALS_NAME)) }}">
+                  </td>
+                  <td>
+                    <img class="overlay-img"
+                         src="{{ nginx_url(pair.get_data_path(config.SHAPE_REND_SEGMENT_VIS_NAME)) }}">
+                    <img class="overlay-img"
+                         src="{{ nginx_url(pair.get_data_path(config.SHAPE_REND_SEGMENT_MAP_NAME)) }}">
+                  </td>
+                  <td>
+                    <img class="overlay-img"
+                         src="{{ nginx_url(pair.get_data_path(config.PAIR_SHAPE_CLEAN_SEGMENT_VIS_NAME)) }}">
+                    <img class="overlay-img"
+                         src="{{ nginx_url(pair.get_data_path(config.PAIR_SHAPE_CLEAN_SEGMENT_MAP_NAME)) }}">
+                  </td>
+                  <td>
+                    <img class="overlay-img" src="{{ nginx_url(pair.get_data_path(config.PAIR_FG_BBOX_NAME)) }}">
+                  </td>
+                </tr>
+              </table>
+
+            </td>
+            <td>
+              {% set camera = pair.get_camera() %}
+              <p>
+                <a href="{{ nginx_url(pair.shape.resized_obj_path) }}">Download Mesh</a>
+              </p>
+              View Matrix
+              <pre>
+              {{ camera.view_mat()|string }}
+              </pre>
+
+              Projection Matrix
+              <pre>
+              {{ camera.projection_mat()|string }}
+              </pre>
+
+              {% set frontal_camera = pair.shape.get_frontal_camera() %}
+              Frontal View Matrix
+              <pre>
+              {{ frontal_camera.view_mat()|string }}
+              </pre>
+
+              Frontal Projection Matrix
+              <pre>
+              {{ frontal_camera.projection_mat()|string }}
+              </pre>
+
+              <a href="{{ url('pair_uncropped_exemplar', pair_id=pair.id|string) }}">Uncropped Exemplar</a>
+            </td>
+
+          </tr>
+        {% endfor %}
+        </tbody>
+
+      </table>
+
+      {{ macros.pagination_bar(cur_page, n_pages, 'pair_list_kostas', page_size=page_size, n_display=10, query=request.query) }}
+
+    {% endif %}
+  </div>
+
+{% endblock %}

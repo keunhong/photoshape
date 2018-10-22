@@ -1,0 +1,128 @@
+{% extends 'layout.html' %}
+{% import "macros.html" as macros %}
+
+{% block title %}Classifier Models{% endblock %}
+
+{% block head %}
+  <style type="text/css">
+    .wrapper {
+      padding: 20px 10px;
+    }
+
+    .models-table {
+      font-size: 12px;
+      table-layout: fixed;
+    }
+
+    .models-table td table {
+      width: 100%;
+    }
+
+    .models-table td table td, .models-table td table th {
+      padding: 3px !important;
+      width: 100%;
+    }
+
+    .param-name-th {
+      width: 150px;
+    }
+
+    .stat-name-th {
+      width: 120px;
+    }
+  </style>
+{% endblock %}
+
+
+{% block content %}
+  <div class="wrapper">
+    <h1>Snapshot Models</h1>
+    {% for snapshot_name, model_list in models_by_snapshot.items() %}
+      <h2>{{ snapshot_name }}</h2>
+      <table class="models-table table table-striped">
+        <thead>
+        <tr>
+          <th>Model</th>
+          <th>Params</th>
+          <th style="width: 75px">Best Epoch</th>
+          <th>Train Stats</th>
+          <th>Validation Stats</th>
+          <th>Inference Results</th>
+        </tr>
+        </thead>
+        {% for model in model_list %}
+          <tr>
+            <td>{{ model['model_name'] }}</td>
+            <td>
+              <table>
+                {% for param_name, param_val in model['params'].items() %}
+                  <tr>
+                    {% if is_dict(param_val) %}
+                      <th rowspan="{{ param_val|length + 1 }}" class="param-name-th">{{ param_name }}</th>
+                      {% for key, val in param_val.items() %}
+                        <tr>
+                          <td> {{ key }}</td>
+                          <td> {{ val }}</td>
+                        </tr>
+                      {% endfor %}
+                    {% else %}
+                      <th class="param-name-th">{{ param_name }}</th>
+                      <td colspan="2">
+                        {{ param_val }}
+                      </td>
+                    {% endif %}
+                  </tr>
+                {% endfor %}
+              </table>
+            </td>
+            <td>
+              {% if model['best_stats'] %}
+                {{ model['best_stats']['epoch'] }}
+              {% endif %}
+            </td>
+            <td>
+              {% if model['best_stats'] %}
+                <table>
+                  {% for stat_name, stat_val in model['best_stats']['train'].items() %}
+                    <tr>
+                      <th class="stat-name-th">{{ stat_name }}</th>
+                      <td>{{ stat_val }}</td>
+                    </tr>
+                  {% endfor %}
+                </table>
+              {% endif %}
+            </td>
+            <td>
+              {% if model['best_stats'] %}
+                <table>
+                  {% for stat_name, stat_val in model['best_stats']['validation'].items() %}
+                    <tr>
+                      <th class="stat-name-th">{{ stat_name }}</th>
+                      <td>{{ stat_val }}</td>
+                    </tr>
+                  {% endfor %}
+                </table>
+              {% endif %}
+            </td>
+            <td>
+              <ul>
+                {% for epoch in model['inference_epochs'] %}
+                  <li>
+                    <a href="{{ url('classifier_inference_results_detailed',
+                          snapshot=model['snapshot_name'],
+                          model=model['model_name'],
+                          epoch=epoch|string) }}">
+                      Epoch {{ epoch }}
+                    </a>
+                  </li>
+                {% endfor %}
+              </ul>
+            </td>
+          </tr>
+        {% endfor %}
+      </table>
+    {% endfor %}
+
+  </div>
+
+{% endblock %}

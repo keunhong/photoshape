@@ -1,0 +1,134 @@
+{% extends 'layout.html' %}
+
+{% block title %}Pair {{ pair.id }}{% endblock %}
+
+{% import "macros.html" as macros %}
+
+{% block head %}
+  <link rel="stylesheet" href="{{ static('css/pairs/list_pairs.css') }}"/>
+  <script src="{{ static('js/shapes/shapes.js') }}"></script>
+  <script src="{{ static('js/exemplars/exemplars.js') }}"></script>
+  <script src="{{ static('js/pairs/list_pairs.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+  <div class="wrapper">
+    <table class="table table-sm pairs-table">
+      <thead class="thead-dark">
+      <tr>
+        <th>Pair ID</th>
+        <th>Split Set</th>
+        <th>Align Dist</th>
+        <th>Shape</th>
+        <th>Exemplar</th>
+        <th>Segments</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+        <td>{{ pair.id }}</td>
+        <td>{{ pair.shape.split_set }}</td>
+        <td>{{ '{:.02f}'.format(pair.distance) }}</td>
+        <td class="exemplar-td">
+          {% if pair.data_exists(config.SHAPE_REND_PREVIEW_NAME) %}
+            <img src="{{ nginx_url(pair.get_data_path(config.SHAPE_REND_PREVIEW_NAME)) }}">
+          {% endif %}
+          {% if pair.data_exists(config.SHAPE_REND_PHONG_NAME) %}
+            <img src="{{ nginx_url(pair.get_data_path(config.SHAPE_REND_PHONG_NAME)) }}">
+          {% else %}
+            <img src="{{ nginx_url(pair.shape.get_data_path(config.SHAPE_REND_PHONG_NAME)) }}">
+            <p class="small">(no pair rend)</p>
+          {% endif %}
+          {{ pair.shape.id }}
+          <p>
+            <label for="shape-exclude-checkbox-{{ pair.shape.id }}">
+              <small>Exclude</small>
+            </label>
+            <input type="checkbox"
+                   id="shape-exclude-checkbox-{{ pair.shape.id }}"
+                   data-shape-id="{{ pair.shape.id }}"
+                   autocomplete="off"
+                   class="shape-exclude-checkbox"
+                {{ 'checked' if pair.shape.exclude else '' }}/>
+          </p>
+        </td>
+        <td class="exemplar-td">
+          <img src="{{ nginx_url(pair.exemplar.cropped_path) }}">
+          {{ pair.exemplar.id }}
+          <p>
+            <label for="exemplar-exclude-checkbox-{{ pair.exemplar.id }}">
+              <small>Exclude</small>
+            </label>
+            <input type="checkbox"
+                   id="exemplar-exclude-checkbox-{{ pair.exemplar.id }}"
+                   data-exemplar-id="{{ pair.exemplar.id }}"
+                   autocomplete="off"
+                   class="exemplar-exclude-checkbox"
+                {{ 'checked' if pair.exemplar.exclude else '' }}/>
+          </p>
+        </td>
+        <td class="exemplar-td">
+
+          <table class="segment-table table table-sm">
+            <thead class="thead-light">
+            <tr>
+              <th colspan="3">Substance</th>
+              <th colspan="3">Segment ID</th>
+              <th colspan="3">Flow</th>
+            </tr>
+            </thead>
+            <tr>
+              <th>MINC</th>
+              <th>Seg ID Majority (Image)</th>
+              <th>Seg ID Majority (Shape)</th>
+              <th>Raw</th>
+              <th>SIFT Flow</th>
+              <th>SIFT Flow + CRF</th>
+              <th>Exemplar Silhouette</th>
+              <th>Shape Silhouette</th>
+            </tr>
+            <tr>
+              <td>
+                <img class="overlay-img"
+                     src="{{ nginx_url(pair.exemplar.get_data_path(config.EXEMPLAR_SUBST_VIS_NAME)) }}">
+              </td>
+              <td>
+                <img class="overlay-img" src="{{ nginx_url(pair.get_data_path(config.PAIR_PROXY_SUBST_VIS_NAME)) }}">
+              </td>
+              <td>
+                <img class="overlay-img" src="{{ nginx_url(pair.get_data_path(config.PAIR_SHAPE_SUBST_VIS_NAME)) }}">
+              </td>
+              <td>
+                <img class="overlay-img" src="{{ nginx_url(pair.get_data_path(config.SHAPE_REND_SEGMENT_VIS_NAME)) }}">
+              </td>
+              <td>
+                <img class="overlay-img"
+                     src="{{ nginx_url(pair.get_data_path(config.PAIR_SHAPE_WARPED_SEGMENT_VIS_NAME)) }}">
+              </td>
+              <td>
+                <img class="overlay-img"
+                     src="{{ nginx_url(pair.get_data_path(config.PAIR_SHAPE_CLEAN_SEGMENT_VIS_NAME)) }}">
+              </td>
+              <td>
+                <img class="overlay-img" src="{{ nginx_url(pair.get_data_path(config.FLOW_EXEMPLAR_SILHOUETTE_VIS)) }}">
+              </td>
+              <td>
+                <img class="overlay-img" src="{{ nginx_url(pair.get_data_path(config.FLOW_SHAPE_SILHOUETTE_VIS)) }}">
+              </td>
+              <td>
+                <img class="overlay-img" src="{{ nginx_url(pair.get_data_path(config.FLOW_VIS_DATA_NAME)) }}">
+              </td>
+              <td>
+                <img class="overlay-img" src="{{ nginx_url(pair.get_data_path(config.SHAPE_REND_SUBSTANCE_NAME)) }}">
+              </td>
+            </tr>
+          </table>
+
+        </td>
+      </tr>
+      </tbody>
+
+    </table>
+  </div>
+
+{% endblock %}

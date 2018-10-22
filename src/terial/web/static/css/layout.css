@@ -1,0 +1,11 @@
+body {
+    font-family: 'Noto Sans';
+}
+
+#content-wrapper {
+    margin: 5px;
+}
+
+.card-disabled {
+    opacity: 0.3;
+}

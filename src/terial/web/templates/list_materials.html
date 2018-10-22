@@ -1,0 +1,112 @@
+{% extends 'layout.html' %}
+{% import "macros.html" as macros %}
+
+{% block title %}Materials{% endblock %}
+
+{% block head %}
+  <link rel="stylesheet" href="{{ static('css/materials/list_materials.css') }}" />
+  <script src="{{ static('js/materials/materials.js') }}"></script>
+  <script src="{{ static('js/materials/list_materials.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+
+  <div class="controls-wrapper">
+    <a class="btn btn-secondary" href="{{ url('material_tree') }}">Tree</a>
+    <div class="btn-group" role="group">
+      <a class="btn btn-primary" href="{{ url('material_list') }}">All</a>
+      {% for substance in substances %}
+        <a class="btn btn-secondary" href="{{ url('material_list').with_query(substance=substance) }}">{{ substance|capitalize }}</a>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="wrapper">
+    <p>Showing {{ materials|length }} of {{ n_total }} materials.</p>
+
+    {{ macros.pagination_bar(cur_page, n_pages, 'material_list',
+                             page_size=page_size, n_display=10, query=query) }}
+
+    <div class="materials-wrapper">
+
+      {% for material in materials %}
+        <div class="card materials-card {{ '' if material.enabled else 'card-disabled'}}">
+          <a href="{{ nginx_url(material.get_data_path('previews/bmps.png')) }}" data-toggle="lightbox">
+            <img class="card-img-top"
+                 src="{{ nginx_url(material.get_data_path('previews/bmps.png')) }}" />
+          </a>
+          {% if material.data_exists('previews/chair_{}.png'.format(material.default_scale)) %}
+            <a href="{{ nginx_url(material.get_data_path('previews/chair_{}.png'.format(material.default_scale))) }}" data-toggle="lightbox">
+              <img class="card-img-top"
+                   src="{{ nginx_url(material.get_data_path('previews/chair_{}.png'.format(material.default_scale))) }}" />
+            </a>
+          {% endif %}
+          <div class="card-body">
+            <h5 class="card-title">{{ material.id }}</h5>
+            <h6 class="card-subtitle">{{ material.name }}</h6>
+            <div class="card-text">
+              <table class="table table-sm table-bordered">
+                <tbody>
+                <tr>
+                  <th>Substance</th>
+                  <td>{{ material.substance }}</td>
+                </tr>
+                <tr>
+                  <th>Scale</th>
+                  <td>
+
+                    <div class="input-group input-group-sm">
+                      <input type="text" class="form-control"
+                             id="material-{{ material.id }}-scale-input"
+                             title="material-{{ material.id }}-scale-input"
+                             value="{{ material.default_scale }}" />
+                      <div class="input-group-append">
+                        <button class="btn btn-secondary btn-sm material-scale-edit-btn"
+                                id="material-{{ material.id }}-scale-btn"
+                                data-material-id="{{ material.id }}">
+                          <i class="fas fa-save"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <th>Type</th>
+                  <td>{{ material.type.name }}</td>
+                </tr>
+                <tr>
+                  <th>Source</th>
+                  <td>{{ material.source }}</td>
+                </tr>
+                <tr>
+                  <th>Source ID</th>
+                  <td>{{ material.source_id }}</td>
+                </tr>
+                <tr>
+                  <th>
+                    <label for="material-enabled-checkbox-{{ material.id }}">
+                      Enabled
+                    </label>
+                  </th>
+                  <td>
+                    <input type="checkbox"
+                           id="material-enabled-checkbox-{{ material.id }}"
+                           class="material-enabled-checkbox"
+                           data-material-id="{{ material.id }}"
+                        {{ 'checked' if material.enabled else '' }} />
+                  </td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    {{ macros.pagination_bar(cur_page, n_pages, 'material_list',
+                             page_size=page_size, n_display=10,
+                             query=query) }}
+  </div>
+
+{% endblock %}

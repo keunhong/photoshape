@@ -1,0 +1,351 @@
+{% extends 'layout.html' %}
+
+{% block title %}Exemplar-Shape Pairs{% endblock %}
+
+{% import "macros.html" as macros %}
+
+{% block head %}
+  <style type="text/css">
+    .wrapper {
+      padding-top: 20px;
+      width: 95vw;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .results-wrapper {
+      text-align: left;
+      margin: 0 auto;
+    }
+
+    .shape-result-div {
+      border-top: 1px solid #aaa;
+      border-left: 10px solid #777777;
+      padding-top: 10px;
+      padding-left: 10px;
+      margin-bottom: 100px;
+      border-radius: 5px;
+    }
+
+    .results-table {
+      font-size: 10px;
+    }
+
+    .results-table .ids-th {
+      width: 50px;
+    }
+
+    .results-table .images-th {
+      width: 501px;
+    }
+
+    .images-td {
+      font-size: 0;
+      padding: 0 !important;
+    }
+
+    .details-div {
+      max-height: 800px;
+      overflow-y: auto;
+    }
+
+    .exemplar-image {
+      width: 250px;
+    }
+
+    .mask-image {
+      width: 150px;
+    }
+
+    .material-preview-img {
+      width: 150px;
+    }
+
+    .rendering-div img {
+      width: 200px;
+    }
+
+    .exemplar-td img {
+      height: 100px;
+    }
+
+    .title-table {
+      width: 800px;
+      margin: 0 auto;
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <div class="wrapper">
+    <h2>Inference Results</h2>
+    <h4>{{ snapshot }}</h4>
+
+    <table class="title-table table table-bordered table-sm">
+      <thead class="thead-dark">
+      <tr>
+        <th>Dataset</th>
+        <th>Snapshot</th>
+        <th>Model</th>
+        <th>Epoch</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+        <td>{{ dataset_name }}</td>
+        <td>{{ snapshot_name }}</td>
+        <td>{{ model_name }}</td>
+        <td>{{ epoch }}</td>
+      </tr>
+      </tbody>
+    </table>
+
+    <p>Showing {{ pairs|length }} of {{ n_total }}</p>
+
+    {{ macros.pagination_bar(cur_page,
+                             n_pages,
+                             'classifier_inference_results_detailed',
+                             page_size=page_size,
+                             n_display=10,
+                             snapshot=snapshot_name,
+                             model=model_name,
+                             epoch=epoch, query=request.query) }}
+
+    <div class="results-wrapper">
+      {% for shape, results in results_by_shape.items() %}
+        <div class="shape-result-div">
+          <h3>Shape {{ shape.id }}</h3>
+          <table class="table table-bordered results-table">
+            <thead class="thead-dark">
+            <tr>
+              <th class="ids-th">IDs</th>
+              <th class="images-th">Images</th>
+              <th class="details-th">Segment Details</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for inference_dict in results %}
+              {% set phong_url = nginx_url(inference_dict['pair'].get_data_path('shape_rend_phong_500x500.png')) %}
+              {% set exemplar_url = nginx_url(inference_dict['exemplar'].cropped_path) %}
+              {% set seg_vis_url = nginx_url(inference_dict['pair'].get_data_path('shape_clean_segments_500x500.vis.v2.png')) %}
+              {% set subst_vis_url = nginx_url(inference_dict['exemplar'].get_data_path('substance_map_minc_vgg16.vis.v2.png')) %}
+              <tr>
+                <td>
+                  <p>
+                    Pair
+                    {{ inference_dict['pair'].id }}
+                    (dist={{ '{:.02f}'.format(inference_dict['pair'].distance) }})
+                  </p>
+                  <p>
+                    Shape
+                    {{ inference_dict['shape'].id }}
+                    ({{ inference_dict['shape'].source }})
+                  </p>
+                  <p>
+                    Exemplar
+                    {{ inference_dict['exemplar'].id }}
+                  </p>
+                </td>
+                <td class="images-td">
+                  <a href="{{ phong_url }}" data-toggle="lightbox">
+                    <img class="exemplar-image" src="{{ phong_url }}"/>
+                  </a>
+                  <a href="{{ exemplar_url }}" data-toggle="lightbox">
+                    <img class="exemplar-image" src="{{ exemplar_url }}"/>
+                  </a>
+                  {% if inference_dict['rendering_path'].exists() %}
+                    {% set rend_url = nginx_url(inference_dict['rendering_path']) %}
+                    <a href="{{ rend_url }}" data-toggle="lightbox">
+                      <img class="exemplar-image" src="{{ rend_url }}"/>
+                    </a>
+                  {% else %}
+                    {% set rend_inferred_url = nginx_url(inference_dict['rend_inferred_path']) %}
+                    {% set rend_mtl_url = nginx_url(inference_dict['rend_mtl_path']) %}
+                    <a href="{{ rend_inferred_url }}" data-toggle="lightbox">
+                      <img class="exemplar-image" src="{{ rend_inferred_url }}"/>
+                    </a>
+                    <a href="{{ rend_mtl_url }}" data-toggle="lightbox">
+                      <img class="exemplar-image" src="{{ rend_mtl_url }}"/>
+                    </a>
+                  {% endif %}
+                  <br />
+                  <a href="{{ seg_vis_url }}" data-toggle="lightbox">
+                    <img class="exemplar-image" src="{{ seg_vis_url }}"/>
+                  </a>
+                  <a href="{{ subst_vis_url }}" data-toggle="lightbox">
+                    <img class="exemplar-image" src="{{ subst_vis_url }}"/>
+                  </a>
+                </td>
+                <td>
+                  <p>
+                    <a class="btn btn-primary"
+                       href="{{ url('classifier_download_blend_file').with_query({
+                         'inference_path': inference_dict['inference_path']|string,
+                         'type': 'inferred',
+                         'no_floor': 'false',
+                       }) }}">
+                      <i class="fas fa-download"></i> .blend (inferred)
+                    </a>
+                    <a class="btn btn-primary"
+                       href="{{ url('classifier_download_blend_file').with_query({
+                         'inference_path': inference_dict['inference_path']|string,
+                         'type': 'inferred',
+                         'animate': 'true',
+                         'no_floor': 'false',
+                       }) }}">
+                      <i class="fas fa-download"></i> .blend (inferred, animate)
+                    </a>
+                    <a class="btn btn-primary"
+                       href="{{ url('classifier_download_blend_file').with_query({
+                         'inference_path': inference_dict['inference_path']|string,
+                         'type': 'mtl',
+                         'no_floor': 'false',
+                       }) }}">
+                      <i class="fas fa-download"></i> .blend (mtl)
+                    </a>
+                    <a class="btn btn-primary"
+                       href="{{ url('classifier_download_blend_file').with_query({
+                         'inference_path': inference_dict['inference_path']|string,
+                         'type': 'mtl',
+                         'animate': 'true',
+                         'no_floor': 'false',
+                       }) }}">
+                      <i class="fas fa-download"></i> .blend (mtl, animate)
+                    </a>
+                    <a class="btn btn-primary" href="{{ url('pair_uncropped_exemplar', pair_id=inference_dict['pair'].id|string) }}">
+                      Uncropped Exemplar
+                    </a>
+                  </p>
+                  <p>
+                    <button class="btn btn-primary"
+                            type="button"
+                            data-toggle="collapse"
+                            data-target="#{{ inference_dict['pair'].id }}-collapse"
+                            aria-expanded="false"
+                            aria-controls="{{ inference_dict['pair'].id }}-collapse">
+                      Show
+                    </button>
+                  </p>
+                  <div class="collapse" id="{{ inference_dict['pair'].id }}-collapse">
+                    <ul class="nav nav-tabs" id="myTab" role="tablist">
+                      {% for seg_id in inference_dict['segments'].keys() %}
+                        {% set tab_id = "segment-{}-{}".format(inference_dict['pair'].id, seg_id) %}
+                        <li class="nav-item">
+                          <a class="nav-link {{ 'active' if loop.first else '' }}" id="{{ tab_id }}-tab"
+                             data-toggle="tab"
+                             href="#{{ tab_id }}" role="tab"
+                             aria-controls="{{ tab_id }}"
+                             aria-selected="false">Segment {{ seg_id }}
+                          </a>
+                        </li>
+                      {% endfor %}
+                    </ul>
+                    <div class="tab-content details-div" id="myTabContent">
+                      {% for seg_id, seg_topk in inference_dict['segments'].items() %}
+                        {% set tab_id = "segment-{}-{}".format(inference_dict['pair'].id, seg_id) %}
+                        <div class="tab-pane fade show {{ 'active' if loop.first else '' }}"
+                             id="{{ tab_id }}"
+                             role="tabpanel"
+                             aria-labelledby="{{ tab_id }}">
+                          <img class="mask-image" src="{{ inference_dict['seg_mask_by_seg_id'][seg_id] }}">
+                          <!-- Substance Table -->
+                          <table class="table table-sm">
+                            <thead>
+                            <tr>
+                              <th>Score</th>
+                              <th>Substance</th>
+                            </tr>
+                            </thead>
+                            {% for subst_match in seg_topk['substance'] %}
+                              <tr>
+                              <td>{{ '{:.02f}%'.format(100*subst_match['score']) }}</td>
+                              <td>
+                                {{ subst_match['name'] }}
+                              </td>
+                            {% endfor %}
+                          </table>
+
+                          <!-- Roughness Table -->
+                          {% if 'roughness' in seg_topk %}
+                            <table class="table table-sm">
+                              <thead>
+                              <tr>
+                                <th>Score</th>
+                                <th>Roughness</th>
+                              </tr>
+                              </thead>
+                              <tbody>
+                              {% for roughness_match in seg_topk['roughness'] %}
+                                <tr>
+                                <td>{{ '{:.02f}%'.format(100*roughness_match['score']) }}</td>
+                                <td>
+                                  {{ roughness_match['value'] }}
+                                </td>
+                              {% endfor %}
+                              </tbody>
+                            </table>
+                          {% endif %}
+
+                          <!-- Material Table -->
+                          <table class="table table-sm">
+                            <thead>
+                            <tr>
+                              <th>Score</th>
+                              <th>Weighted Score</th>
+                              <th>Preview</th>
+                              <th>ID</th>
+                              <th>Name</th>
+                              <th>Substance</th>
+                            </tr>
+                            </thead>
+                            {% for mat_match in seg_topk['material'] %}
+                              {% set mat = mat_by_id[mat_match['id']|int] %}
+                              {% set bmps_url = nginx_url(mat.get_data_path('previews/bmps.png')) %}
+                              <tr>
+                              <td>{{ '{:.02f}%'.format(100*mat_match['score']) }}</td>
+                              <td>
+                                {{ '{:.02f}%'.format(100*mat_match['weighted_score']) if 'weighted_score' in mat_match }}
+                              </td>
+                              <td>
+                                <a href="{{ bmps_url }}" data-toggle="lightbox">
+                                  <img class="material-preview-img" src="{{ bmps_url }}"/>
+                                </a>
+                              </td>
+                              <td>{{ mat.id }}</td>
+                              <td>{{ mat.name }}</td>
+                              <td>{{ mat.substance }}</td>
+                              <td>
+                                <a href="{{ url('classifier_search_dataset', dataset_name=dataset_name).with_query(material_id=mat.id) }}">
+                                  Renderings
+                                </a>
+
+                              </td>
+                            {% endfor %}
+                          </table>
+                          <!--/ Material Table -->
+                        </div>
+                      {% endfor %}
+                    </div>
+                    <!--/ segment div -->
+                  </div>
+                </td>
+                <!--/ segment-details-td -->
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% endfor %}
+    </div>
+
+    {{ macros.pagination_bar(cur_page,
+                             n_pages,
+                             'classifier_inference_results_detailed',
+                             page_size=page_size,
+                             n_display=10,
+                             snapshot=snapshot_name,
+                             model=model_name,
+                             epoch=epoch, query=request.query) }}
+  </div>
+
+{% endblock %}

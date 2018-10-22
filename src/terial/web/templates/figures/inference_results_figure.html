@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>3-Way Results Figure | Terial</title>
+
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <link href="https://fonts.googleapis.com/css?family=Noto+Sans|Noto+Serif|Roboto+Mono" rel="stylesheet">
+
+  <script
+      src="https://code.jquery.com/jquery-3.3.1.min.js"
+      integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+      crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+          integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+          crossorigin="anonymous"></script>
+
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+          integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+          crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.bundle.min.js"
+          integrity="sha384-feJI7QwhOS+hwpX2zkaeJQjeiwlhOP+SdQDqhgvvo1DsjtiSQByFdThsxO669S2D"
+          crossorigin="anonymous"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ekko-lightbox/5.3.0/ekko-lightbox.js"
+          crossorigin="anonymous"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/ekko-lightbox/5.3.0/ekko-lightbox.css" rel="stylesheet"
+        crossorigin="anonymous">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.16/js/jquery.dataTables.min.js"
+          integrity="sha256-qcV1wr+bn4NoBtxYqghmy1WIBvxeoe8vQlCowLG+cng=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.16/js/dataTables.bootstrap4.min.js"
+          integrity="sha256-PahDJkda1lmviWgqffy4CcrECIFPJCWoa9EAqVx7Tf8=" crossorigin="anonymous"></script>
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.16/css/dataTables.bootstrap4.min.css"
+        integrity="sha256-LpykTdjMm+jVLpDWiYOkH8bYiithb4gajMYnIngj128=" crossorigin="anonymous"/>
+
+  <link href="{{ static('css/layout.css') }}" rel="stylesheet"/>
+  <script src="{{ static('js/layout.js') }}"></script>
+
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css"
+        integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+  <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"
+        integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+
+  <style>
+
+
+    .images-td {
+      width: 250px;
+      font-size: 0;
+      padding: 0 !important;
+    }
+
+    .exemplar-image {
+      width: 250px;
+    }
+
+    .results-table {
+      float: left;
+      border-left: 3px solid #999;
+    }
+
+    .results-table th {
+      background-color: #000;
+      color: #fff;
+      padding: 5px;
+    }
+
+    .results-table td, .results-table th {
+      {#border: 1px solid #999;#}
+    }
+
+  </style>
+</head>
+<body>
+
+<div class="results-wrapper">
+  {% for shape, results in results_by_shape.items() %}
+    {% set outer_loop = loop %}
+    <div class="shape-result-div">
+      <table class="results-table">
+        <thead class="thead-dark">
+        <tr>
+          <th class="images-th">Shape</th>
+          <th class="images-th">Exemplar</th>
+          <th class="images-th">Ours</th>
+{#          <th class="images-th">Baseline</th>#}
+        </tr>
+        </thead>
+        <tbody>
+        {% for inference_dict in results %}
+          {#          {% set phong_url = nginx_url(inference_dict['pair'].get_data_path('shape_rend_phong_500x500.png')) %}#}
+          {% set phong_url = nginx_url(inference_dict['pair'].shape.get_data_path('shape_rend_phong_500x500.png')) %}
+          {% set exemplar_url = nginx_url(inference_dict['exemplar'].cropped_path) %}
+          {% set seg_vis_url = nginx_url(inference_dict['pair'].get_data_path('shape_clean_segments_500x500.vis.v2.png')) %}
+          {% set subst_vis_url = nginx_url(inference_dict['exemplar'].get_data_path('substance_map_minc_vgg16.vis.v2.png')) %}
+          {% set rend_inferred_url = nginx_url(inference_dict['rend_inferred_path']) %}
+          {% set rend_mtl_url = nginx_url(inference_dict['rend_mtl_path']) %}
+          {% set rend_baseline_url = nginx_url(inference_dict['rend_baseline_path']) %}
+          {% set rend_minc_inferred_url = nginx_url(inference_dict['rend_minc_inferred_path']) %}
+          <tr>
+            {% if loop.first %}
+              <td class="images-td" rowspan="{{ results|length }}">
+                <a href="{{ phong_url }}" data-toggle="lightbox">
+                  <img class="exemplar-image" src="{{ phong_url }}"/>
+                </a>
+              </td>
+            {% endif %}
+            <td class="images-td">
+              <a href="{{ exemplar_url }}" data-toggle="lightbox">
+                <img class="exemplar-image" src="{{ exemplar_url }}"/>
+              </a>
+            </td>
+            <td class="images-td">
+              <a href="{{ rend_inferred_url }}" data-toggle="lightbox">
+                <img class="exemplar-image" src="{{ rend_inferred_url }}"/>
+              </a>
+            </td>
+{#            <td class="images-td">#}
+{#              <a href="{{ rend_baseline_url }}" data-toggle="lightbox">#}
+{#                <img class="exemplar-image" src="{{ rend_baseline_url }}"/>#}
+{#              </a>#}
+{#            </td>#}
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% endfor %}
+</div>
+
+</body>
+</html>

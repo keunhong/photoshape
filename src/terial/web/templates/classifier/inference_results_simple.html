@@ -1,0 +1,223 @@
+{% extends 'layout.html' %}
+
+{% block title %}Exemplar-Shape Pairs{% endblock %}
+
+{% import "macros.html" as macros %}
+
+{% block head %}
+  <style type="text/css">
+    .wrapper {
+      padding-top: 20px;
+      width: 95vw;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .results-wrapper {
+      text-align: left;
+      margin: 0 auto;
+    }
+
+    .shape-result-div {
+      border-top: 1px solid #aaa;
+      border-left: 10px solid #777777;
+      padding-top: 10px;
+      padding-left: 10px;
+      margin-bottom: 100px;
+      border-radius: 5px;
+    }
+
+    .results-table {
+      font-size: 10px;
+      table-layout: fixed;
+      width: auto;
+    }
+
+    .results-table .ids-th {
+      width: 50px;
+    }
+
+    .results-table .images-th {
+    }
+
+    .images-td {
+      width: 250px;
+      font-size: 0;
+      padding: 0 !important;
+    }
+
+    .exemplar-image {
+      width: 250px;
+    }
+
+    .rendering-div img {
+      width: 200px;
+    }
+
+    .title-table {
+      width: 800px;
+      margin: 0 auto;
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <div class="wrapper">
+    <h2>Inference Results</h2>
+    <h4>{{ snapshot }}</h4>
+
+    <table class="title-table table table-bordered table-sm">
+      <thead class="thead-dark">
+      <tr>
+        <th>Dataset</th>
+        <th>Snapshot</th>
+        <th>Model</th>
+        <th>Epoch</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+        <td>{{ dataset_name }}</td>
+        <td>{{ snapshot_name }}</td>
+        <td>{{ model_name }}</td>
+        <td>{{ epoch }}</td>
+      </tr>
+      </tbody>
+    </table>
+
+    <p>Showing {{ pairs|length }} of {{ n_pairs }}</p>
+
+    {{ macros.pagination_bar(cur_page,
+                             n_pages,
+                             'classifier_inference_results_simple',
+                             page_size=page_size,
+                             n_display=10,
+                             snapshot=snapshot_name,
+                             model=model_name,
+                             epoch=epoch, query=request.query) }}
+
+    <div class="results-wrapper">
+      {% for shape, results in results_by_shape.items() %}
+        <div class="shape-result-div">
+          <h3>Shape {{ shape.id }}</h3>
+          <table class="table table-bordered results-table">
+            <thead class="thead-dark">
+            <tr>
+              <th class="ids-th">#</th>
+              <th class="ids-th">IDs</th>
+              <th class="images-th">Shape</th>
+              <th class="images-th">Exemplar</th>
+              <th class="images-th">Ours</th>
+              <th class="images-th">Ours (Frontal)</th>
+{#              <th class="images-th">Ours (Forced Subst)</th>#}
+              <th class="images-th">Baseline</th>
+              <th class="images-th">Default</th>
+              <th class="images-th">Segment Map</th>
+              <th class="images-th">Substance Map</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for inference_dict in results %}
+              {% set phong_url = nginx_url(inference_dict['pair'].get_data_path('shape_rend_phong_500x500.png')) %}
+              {% set exemplar_url = nginx_url(inference_dict['exemplar'].cropped_path) %}
+              {% set seg_vis_url = nginx_url(inference_dict['pair'].get_data_path('shape_clean_segments_500x500.vis.v2.png')) %}
+              {% set subst_vis_url = nginx_url(inference_dict['exemplar'].get_data_path('substance_map_minc_vgg16.vis.v2.png')) %}
+              <tr>
+                <td>
+                  {{ loop.index }}
+                </td>
+                <td>
+                  <p>
+                    Pair
+                    {{ inference_dict['pair'].id }}
+                    (dist={{ '{:.02f}'.format(inference_dict['pair'].distance) }})
+                  </p>
+                  <p>
+                    Shape
+                    {{ inference_dict['shape'].id }}
+                    ({{ inference_dict['shape'].source }})
+                  </p>
+                  <p>
+                    Exemplar
+                    {{ inference_dict['exemplar'].id }}
+                  </p>
+                </td>
+                <td class="images-td">
+                  <a href="{{ phong_url }}" data-toggle="lightbox">
+                    <img class="exemplar-image" src="{{ phong_url }}"/>
+                  </a>
+                </td>
+                <td class="images-td">
+                  <a href="{{ exemplar_url }}" data-toggle="lightbox">
+                    <img class="exemplar-image" src="{{ exemplar_url }}"/>
+                  </a>
+                </td>
+                {% if inference_dict['rendering_path'].exists() %}
+                  <td class="images-td">
+                    {% set rend_url = nginx_url(inference_dict['rendering_path']) %}
+                    <a href="{{ rend_url }}" data-toggle="lightbox">
+                      <img class="exemplar-image" src="{{ rend_url }}"/>
+                    </a>
+                  </td>
+                  <td></td>
+                {% else %}
+                  {% set rend_inferred_url = nginx_url(inference_dict['rend_inferred_path']) %}
+                  {% set rend_inferred_frontal_url = nginx_url(inference_dict['rend_inferred_frontal_path']) %}
+                  {% set rend_minc_inferred_url = nginx_url(inference_dict['rend_minc_inferred_path']) %}
+                  {% set rend_mtl_url = nginx_url(inference_dict['rend_mtl_path']) %}
+                  {% set rend_baseline_url = nginx_url(inference_dict['rend_baseline_path']) %}
+                  <td class="images-td">
+                    <a href="{{ rend_inferred_url }}" data-toggle="lightbox">
+                      <img class="exemplar-image" src="{{ rend_inferred_url }}"/>
+                    </a>
+                  </td>
+                  <td class="images-td">
+                    <a href="{{ rend_inferred_frontal_url }}" data-toggle="lightbox">
+                      <img class="exemplar-image" src="{{ rend_inferred_frontal_url }}"/>
+                    </a>
+                  </td>
+{#                  <td class="images-td">#}
+{#                    <a href="{{ rend_minc_inferred_url }}" data-toggle="lightbox">#}
+{#                      <img class="exemplar-image" src="{{ rend_minc_inferred_url }}"/>#}
+{#                    </a>#}
+{#                  </td>#}
+                  <td class="images-td">
+                    <a href="{{ rend_baseline_url }}" data-toggle="lightbox">
+                      <img class="exemplar-image" src="{{ rend_baseline_url }}"/>
+                    </a>
+                  </td>
+                  <td class="images-td">
+                    <a href="{{ rend_mtl_url }}" data-toggle="lightbox">
+                      <img class="exemplar-image" src="{{ rend_mtl_url }}"/>
+                    </a>
+                  </td>
+                {% endif %}
+                <td class="images-td">
+                  <a href="{{ seg_vis_url }}" data-toggle="lightbox">
+                    <img class="exemplar-image" src="{{ seg_vis_url }}"/>
+                  </a>
+                </td>
+                <td class="images-td">
+                  <a href="{{ subst_vis_url }}" data-toggle="lightbox">
+                    <img class="exemplar-image" src="{{ subst_vis_url }}"/>
+                  </a>
+                </td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% endfor %}
+    </div>
+
+    {{ macros.pagination_bar(cur_page,
+                             n_pages,
+                             'classifier_inference_results_simple',
+                             page_size=page_size,
+                             n_display=10,
+                             snapshot=snapshot_name,
+                             model=model_name,
+                             epoch=epoch, query=request.query) }}
+  </div>
+
+{% endblock %}

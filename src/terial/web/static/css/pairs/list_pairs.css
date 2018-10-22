@@ -1,0 +1,44 @@
+.wrapper {
+    padding-top: 20px;
+    width: 95vw;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.renderings-wrapper {
+    text-align: center;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.rendering-div {
+    margin: 5px;
+    width: 200px;
+    height: 200px;
+    overflow: hidden;
+}
+
+.pairs-table {
+    font-size: 10px;
+}
+
+.rendering-div img {
+    width: 100px;
+}
+
+.exemplar-td img {
+    height: 140px;
+}
+
+.small {
+    font-size: 8px;
+}
+
+.segment-table {
+    font-size: 10px;
+}
+
+.segment-table td, .segment-table th {
+    padding: 0;
+}

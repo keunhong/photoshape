@@ -1,0 +1,100 @@
+{% import "macros.html" as macros %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}{% endblock %} | Terial</title>
+
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <link href="https://fonts.googleapis.com/css?family=Noto+Sans|Noto+Serif|Roboto+Mono" rel="stylesheet">
+
+  <script
+      src="https://code.jquery.com/jquery-3.3.1.min.js"
+      integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+      crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+          integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+          crossorigin="anonymous"></script>
+
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+          integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+          crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.bundle.min.js"
+          integrity="sha384-feJI7QwhOS+hwpX2zkaeJQjeiwlhOP+SdQDqhgvvo1DsjtiSQByFdThsxO669S2D"
+          crossorigin="anonymous"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ekko-lightbox/5.3.0/ekko-lightbox.js"
+          crossorigin="anonymous"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/ekko-lightbox/5.3.0/ekko-lightbox.css" rel="stylesheet"
+        crossorigin="anonymous">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.16/js/jquery.dataTables.min.js"
+          integrity="sha256-qcV1wr+bn4NoBtxYqghmy1WIBvxeoe8vQlCowLG+cng=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.16/js/dataTables.bootstrap4.min.js"
+          integrity="sha256-PahDJkda1lmviWgqffy4CcrECIFPJCWoa9EAqVx7Tf8=" crossorigin="anonymous"></script>
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.16/css/dataTables.bootstrap4.min.css"
+        integrity="sha256-LpykTdjMm+jVLpDWiYOkH8bYiithb4gajMYnIngj128=" crossorigin="anonymous"/>
+
+  <link href="{{ static('css/layout.css') }}" rel="stylesheet"/>
+  <script src="{{ static('js/layout.js') }}"></script>
+
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css"
+        integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+  <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"
+        integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+
+  <style>
+
+    body {
+      font-family: 'Avenir Next';
+    }
+
+    .col-table td {
+      padding: 0 !important;
+    }
+
+    .grid-wrapper {
+      font-size: 0;
+    }
+
+    .rendering-image {
+      width: 100px;
+    }
+
+    .results-wrapper {
+    }
+
+  </style>
+</head>
+<body>
+
+<div class="results-wrapper">
+
+  Total: {{ n_total }}
+
+{#  {% for i in range(10) %}#}
+{#  <a href="{{ '{:03d}'.format(i) }}.html">{{ i }}</a>#}
+{#  {% endfor %}#}
+  {{ macros.pagination_bar(cur_page, n_pages, 'classifier_show_prcs', resultset_id=resultset_id,
+                           page_size=page_size, n_display=10, query=request.query) }}
+
+  <div class="grid-wrapper">
+
+  {% for pair in pairs %}
+    {% set path = inference_dir / 'renderings-calibrated-cropped' / (pair.id|string+'.inferred.0000.jpg') %}
+    {% set sm_path = inference_dir / 'renderings-frontal-small' / (pair.id|string+'.inferred.0000.jpg') %}
+{#    {% if sm_path.exists() %}#}
+      <a href="{{ nginx_url(path) }}" data-toggle="lightbox">
+        <img class="rendering-image" src="{{ nginx_url(path) }}"/>
+      </a>
+{#    {% endif %}#}
+  {% endfor %}
+  </div>
+
+</div>
+
+</body>
+</html>

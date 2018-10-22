@@ -1,0 +1,29 @@
+{% extends 'layout.html' %}
+
+{% block title %}Material Tree{% endblock %}
+
+{% block head %}
+  <style type="text/css">
+    .exemplar-td img {
+    {#width: 1000px;#}
+    }
+
+    .material-exemplar-img {
+      width: 100px;
+    }
+  </style>
+
+  <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  <script>
+    var JSON_URL = "{{ url('material_tree_json') }}";
+  </script>
+
+  <link href="{{ static('css/material_tree.css') }}" rel="stylesheet"/>
+  <script src="{{ static('js/material_tree.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+
+  <section id="vis"></section>
+
+{% endblock %}

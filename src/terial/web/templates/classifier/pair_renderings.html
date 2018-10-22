@@ -1,0 +1,70 @@
+{% extends 'layout.html' %}
+
+{% block title %}Inferred Renderings{% endblock %}
+
+{% import "macros.html" as macros %}
+
+{% block head %}
+  <style type="text/css">
+    .wrapper {
+      padding-top: 20px;
+      width: 95vw;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .exemplar-image {
+      width: 500px;
+    }
+
+    .rendering-div img {
+      width: 200px;
+    }
+
+    .exemplar-td img {
+      height: 100px;
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <div class="wrapper">
+    <h2>Inference Results</h2>
+    <h4>{{ snapshot }}</h4>
+
+    <p>Showing {{ results|length }} of {{ n_total }}</p>
+
+    {{ macros.pagination_bar(cur_page, n_pages, 'classifier_pair_renderings', page_size=page_size, n_display=10, snapshot=snapshot) }}
+
+    <table class="table table-sm table-bordered">
+      <thead>
+      <tr>
+        <th>Pair ID</th>
+        <th>Shape ID</th>
+        <th>Distance</th>
+        <th>Exemplar</th>
+        <th>Shape</th>
+        <th>Baseline (Median Color)</th>
+        <th>Classifier</th>
+      </tr>
+      </thead>
+      <tbody>
+      {% for result in results %}
+        <tr>
+          <td>{{ result['pair'].id }}</td>
+          <td>{{ result['pair'].shape_id }}</td>
+          <td>{{ result['pair'].distance }}</td>
+          <td><img class="exemplar-image" src="{{ result['exemplar_image_url'] }}"/></td>
+          <td><img class="exemplar-image" src="{{ result['shape_image_url'] }}"/></td>
+          <td><img class="exemplar-image" src="{{ result['baseline_color_image_url'] }}"/></td>
+          <td><img class="exemplar-image" src="{{ result['top1_image_url'] }}"/></td>
+        </tr>
+      {% endfor %}
+      </tbody>
+
+    </table>
+
+    {{ macros.pagination_bar(cur_page, n_pages, 'classifier_pair_renderings', page_size=page_size, n_display=10, snapshot=snapshot) }}
+  </div>
+
+{% endblock %}

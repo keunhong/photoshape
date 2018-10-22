@@ -1,0 +1,18 @@
+[submodule "thirdparty/rendkit"]
+	path = thirdparty/rendkit
+	url = git@github.com:keunhong/rendkit.git
+[submodule "thirdparty/kitnn"]
+	path = thirdparty/kitnn
+	url = git@github.com:keunhong/kitnn.git
+[submodule "thirdparty/toolbox"]
+	path = thirdparty/toolbox
+	url = git@github.com:keunhong/toolbox.git
+[submodule "thirdparty/vispy"]
+	path = thirdparty/vispy
+	url = git@github.com:keunhong/vispy.git
+[submodule "thirdparty/siftflow"]
+	path = thirdparty/siftflow
+	url = git@github.com:keunhong/siftflow.git
+[submodule "thirdparty/brender"]
+	path = thirdparty/brender
+	url = git@github.com:keunhong/brender.git

@@ -1,0 +1,69 @@
+{% extends 'layout.html' %}
+{% import "macros.html" as macros %}
+
+{% block title %}Shapes{% endblock %}
+
+{% block head %}
+  <script src="{{ static('js/shapes/shapes.js') }}"></script>
+  <script src="{{ static('js/shapes/list_shapes.js') }}"></script>
+  <style type="text/css">
+    .wrapper {
+      padding-top: 20px;
+      width: 95vw;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .renderings-wrapper {
+      text-align: center;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .rendering-div {
+      margin: 5px;
+      width: 200px;
+    }
+
+    .rendering-div img {
+      width: 200px;
+    }
+  </style>
+{% endblock %}
+
+
+{% block content %}
+  <div class="wrapper">
+
+    <p>Showing {{ exemplars|length }} of {{ n_total }} shapes.</p>
+
+    {{ macros.pagination_bar(cur_page, n_pages, 'shape_list', page_size=page_size, n_display=10, query=request.query) }}
+
+    <div class="renderings-wrapper">
+      {% for shape in shapes %}
+        <div class="card rendering-div {{ 'card-disabled' if shape.exclude }}">
+          <a href="{{ nginx_url(shape.get_data_path(config.SHAPE_REND_PHONG_NAME)) }}" data-toggle="lightbox">
+            <img class="card-img-top" src="{{ nginx_url(shape.get_data_path(config.SHAPE_REND_PHONG_NAME)) }}"/>
+          </a>
+          <div class="card-body">
+            <h5 class="card-title">{{ shape.id }}</h5>
+            <p class="card-text">{{ shape.category }}</p>
+            <p class="card-text">
+              <label for="shape-exclude-checkbox-{{ shape.id }}">Exclude</label>
+              <input type="checkbox"
+                     id="shape-exclude-checkbox-{{ shape.id }}"
+                     class="shape-exclude-checkbox"
+                     data-shape-id="{{ shape.id }}"
+                  {{ 'checked' if shape.exclude else '' }} />
+            </p>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    {{ macros.pagination_bar(cur_page, n_pages, 'shape_list', page_size=page_size, n_display=10, query=request.query) }}
+
+  </div>
+
+{% endblock %}

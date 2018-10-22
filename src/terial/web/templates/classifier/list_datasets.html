@@ -1,0 +1,39 @@
+{% extends 'layout.html' %}
+{% import "macros.html" as macros %}
+
+{% block title %}Datasets{% endblock %}
+
+{% block head %}
+  <style type="text/css">
+    .wrapper {
+      padding-top: 20px;
+    }
+  </style>
+{% endblock %}
+
+
+{% block content %}
+  <div class="wrapper">
+
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for dataset_name in dataset_names %}
+        <tr>
+          <td>{{ dataset_name }}</td>
+          <td>
+            <a class="btn btn-primary" href="{{ url('classifier_search_dataset', dataset_name=dataset_name, page='0') }}">Renderings</a>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  </div>
+
+{% endblock %}

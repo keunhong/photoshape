@@ -1,0 +1,40 @@
+{% extends 'layout.html' %}
+{% import "macros.html" as macros %}
+
+{% block title %}Dataset Snapshots{% endblock %}
+
+{% block head %}
+  <style type="text/css">
+    .wrapper {
+      padding-top: 20px;
+    }
+  </style>
+{% endblock %}
+
+
+{% block content %}
+  <div class="wrapper">
+
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for snapshot_name in snapshot_names %}
+        <tr>
+          <td>{{ snapshot_name }}</td>
+          <td>
+            <a class="btn btn-primary" href="{{ url('classifier_inference_results_detailed', snapshot=snapshot_name, page='0') }}">Inferred Materials</a>
+            <a class="btn btn-primary" href="{{ url('classifier_pair_renderings', snapshot=snapshot_name, page='0') }}">Inferred Renderings</a>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  </div>
+
+{% endblock %}

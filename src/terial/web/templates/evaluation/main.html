@@ -1,0 +1,68 @@
+{% extends 'evaluation/layout.html' %}
+
+{% block title %}Exemplar-Shape Pairs{% endblock %}
+
+{% import "macros.html" as macros %}
+
+{% block head %}
+  <style type="text/css">
+    .wrapper {
+      padding-top: 20px;
+      width: 95vw;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    #result-div {
+      width: 1500px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .result-table {
+      table-layout: fixed;
+    }
+
+    .result-control-td button {
+      width: 200px;
+      margin: 3px;
+    }
+
+    .img-td {
+      padding: 0;
+    }
+
+    .result-img {
+      height: 500px;
+    }
+    .exemplar-img {
+      height: 500px;
+      border: 1px solid #555;
+    }
+
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jsrender/0.9.90/jsrender.min.js" integrity="sha256-btLQj6RlkxXK4cg6XHngg3OVgPdiD3QlkaYMZacCmpA=" crossorigin="anonymous"></script>
+  <script>
+    var username = "{{ request.query['username'] }}";
+    var token = "{{ request.query['token'] }}";
+    var resultSet = "{{ result_set }}";
+    var shapeSource = "{{ shape_source }}";
+  </script>
+  <script src="{{ static('js/evaluation/main.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+  <div class="wrapper">
+    <h2>Hi {{ request.query['username'] }}</h2>
+
+    <div id="controls-div">
+{#      <button id="prev-shape-btn" class="btn btn-secondary">Previous</button>#}
+{#      <button id="next-shape-btn" class="btn btn-primary">Next</button>#}
+    </div>
+
+    <div id="result-div">
+    </div>
+
+  </div>
+
+{% endblock %}

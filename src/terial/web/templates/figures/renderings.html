@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Renderings Grid | Terial</title>
+  <style>
+    body {
+      font-size: 0;
+    }
+    img {
+      width: 50px;
+      padding: 0
+    }
+  </style>
+</head>
+<body>
+
+
+{% for rendering in renderings %}
+  {% set ldr_path_small = rendering.get_ldr_path((384, 384)) %}
+  <img class="card-img-top" src="{{ nginx_url(ldr_path_small) }}" />
+{% endfor %}
+
+</body>
+</html>

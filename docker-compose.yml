@@ -1,0 +1,17 @@
+version: '3.3'
+volumes:
+  pgdata:
+  logs:
+services:
+  postgres:
+    restart: always
+    image: postgres:latest
+    environment:
+      POSTGRES_PASSWORD: 'photoshape_password'
+      POSTGRES_USER: 'photoshape_user'
+      POSTGRES_DB: 'photoshape_db'
+    volumes:
+      - pgdata:/var/lib/postgresql/data/
+      - .:/app
+    ports:
+      - "15432:5432"

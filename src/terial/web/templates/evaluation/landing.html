@@ -1,0 +1,221 @@
+{% extends 'evaluation/layout.html' %}
+
+{% block title %}Exemplar-Shape Pairs{% endblock %}
+
+{% import "macros.html" as macros %}
+
+{% block head %}
+  <style type="text/css">
+    .wrapper {
+      padding-top: 20px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    #result-div {
+      width: 1000px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .result-table {
+      table-layout: fixed;
+    }
+
+    .result-control-td button {
+      width: 200px;
+      margin: 3px;
+    }
+
+    .img-td {
+      padding: 0;
+    }
+
+    .result-img {
+      height: 300px;
+    }
+
+    .exemplar-img {
+      height: 200px;
+      border: 1px solid #555;
+    }
+
+    img {
+      height: 200px;
+    }
+
+    .btn {
+      width: 180px;
+    }
+
+    .example-td {
+      width: 600px;
+    }
+
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jsrender/0.9.90/jsrender.min.js"
+          integrity="sha256-btLQj6RlkxXK4cg6XHngg3OVgPdiD3QlkaYMZacCmpA=" crossorigin="anonymous"></script>
+  <script>
+    var username = "{{ request.query['username'] }}";
+    var token = "{{ request.query['token'] }}";
+    var resultSet = "{{ result_set }}";
+    var shapeSource = "{{ shape_source }}";
+  </script>
+{% endblock %}
+
+{% block content %}
+  <div class="wrapper">
+    <h2>Hi {{ request.query['username'] }}</h2>
+
+    <p>
+      The goal of our project is to create a plausible set of 3D models.
+    </p>
+    <p>
+      We would like you to help us evaluate our system by indicating the quality of our results, and the mode of failure
+      of applicable.
+    </p>
+    <p>
+      Here are our categories and examples of them:
+    </p>
+
+    <table class="table table-striped table-sm">
+      <thead>
+        <tr>
+          <th style="width: 150px;">Category</th>
+          <th style="width: 100px;">Description</th>
+          <th>Examples (Image/Rendering)</th>
+        </tr>
+      </thead>
+      <tr>
+        <th>
+          <button class="annotate-btn btn btn-outline-success">Good</button>
+        </th>
+        <td>The rendering is a very good representation of the image.</td>
+        <td class="example-td">
+          <img class="exemplar-img" src="http://localhost:9999/data/terial/exemplars/827/cropped.jpg">
+          <img
+              src="http://localhost:9999/static-terial/brdf-classifier/inference/20180516-500x500/20180527.022554.resnet34.opensurface_pretrained_on_substance_only.subst_loss=fc.color_loss=none.lab_10,10,10_1.0,1.0,1.0.lr=0.0001.mask_noise_p=0.0.use_variance.sanka/45/renderings-cropped/6427.inferred.0000.jpg">
+          <img class="exemplar-img" src="http://localhost:9999/data/terial/exemplars/1453/cropped.jpg">
+          <img
+              src="http://localhost:9999/static-terial/brdf-classifier/inference/20180516-500x500/20180527.022554.resnet34.opensurface_pretrained_on_substance_only.subst_loss=fc.color_loss=none.lab_10,10,10_1.0,1.0,1.0.lr=0.0001.mask_noise_p=0.0.use_variance.sanka/45/renderings-cropped/10811.inferred.0000.jpg">
+        </td>
+      </tr>
+      <tr>
+        <th>
+          <button class="annotate-btn btn btn-outline-success">Acceptable</button>
+        </th>
+        <td>There are some slight issues but the rendering is a plausible representation.</td>
+        <td class="example-td">
+          <img class="exemplar-img" src="http://localhost:9999/data/terial/exemplars/371/cropped.jpg">
+          <img
+              src="http://localhost:9999/static-terial/brdf-classifier/inference/20180516-500x500/20180527.022554.resnet34.opensurface_pretrained_on_substance_only.subst_loss=fc.color_loss=none.lab_10,10,10_1.0,1.0,1.0.lr=0.0001.mask_noise_p=0.0.use_variance.sanka/45/renderings-cropped/3247.inferred.0000.jpg">
+          <img class="exemplar-img" src="http://localhost:9999/data/terial/exemplars/1228/cropped.jpg">
+          <img
+              src="http://localhost:9999/static-terial/brdf-classifier/inference/20180516-500x500/20180527.022554.resnet34.opensurface_pretrained_on_substance_only.subst_loss=fc.color_loss=none.lab_10,10,10_1.0,1.0,1.0.lr=0.0001.mask_noise_p=0.0.use_variance.sanka/45/renderings-cropped/9234.inferred.0000.jpg">
+        </td>
+      </tr>
+      <tr>
+        <th>
+          <button class="annotate-btn btn btn-outline-warning">Bad Quality</button>
+        </th>
+        <td>
+          It gets the right idea but it look messy.
+          <ul>
+            <li>Different materials for same parts</li>
+          </ul>
+        </td>
+        <td class="example-td">
+          <img class="exemplar-img" src="http://localhost:9999/data/terial/exemplars/36913/cropped.jpg">
+          <img src="http://localhost:9999/static-terial/brdf-classifier/inference/20180516-500x500/20180527.022554.resnet34.opensurface_pretrained_on_substance_only.subst_loss=fc.color_loss=none.lab_10,10,10_1.0,1.0,1.0.lr=0.0001.mask_noise_p=0.0.use_variance.sanka/45/renderings-cropped/43642.inferred.0000.jpg">
+        </td>
+      </tr>
+      <tr>
+        <th>
+          <button class="annotate-btn btn btn-outline-danger">Wrong Color/Pattern</button>
+        </th>
+        <td>
+          Correct material but incorrect pattern or color
+          <ul>
+            <li>Yellow leather instead of orange</li>
+          </ul>
+        </td>
+        <td class="example-td">
+          <img class="exemplar-img" src="http://localhost:9999/data/terial/exemplars/16306/cropped.jpg">
+          <img src="http://localhost:9999/static-terial/brdf-classifier/inference/20180516-500x500/20180527.022554.resnet34.opensurface_pretrained_on_substance_only.subst_loss=fc.color_loss=none.lab_10,10,10_1.0,1.0,1.0.lr=0.0001.mask_noise_p=0.0.use_variance.sanka/45/renderings-cropped/153053.inferred.0000.jpg">
+        </td>
+      </tr>
+      <tr>
+        <th>
+          <button class="annotate-btn btn btn-outline-danger">Wrong Shape/Alignment</button>
+        </th>
+        <td>The exemplar and rendering are not the same objects or aren't aligned properly. The number of parts do not match</td>
+        <td class="example-td">
+          <img class="exemplar-img" src="http://localhost:9999/data/terial/exemplars/12854/cropped.jpg">
+          <img
+              src="http://localhost:9999/static-terial/brdf-classifier/inference/20180516-500x500/20180527.022554.resnet34.opensurface_pretrained_on_substance_only.subst_loss=fc.color_loss=none.lab_10,10,10_1.0,1.0,1.0.lr=0.0001.mask_noise_p=0.0.use_variance.sanka/45-minc-subst/renderings-cropped/96302.inferred.0000.jpg">
+          <img class="exemplar-img" src="http://localhost:9999/data/terial/exemplars/7211/cropped.jpg">
+          <img
+              src="http://localhost:9999/static-terial/brdf-classifier/inference/20180516-500x500/20180527.022554.resnet34.opensurface_pretrained_on_substance_only.subst_loss=fc.color_loss=none.lab_10,10,10_1.0,1.0,1.0.lr=0.0001.mask_noise_p=0.0.use_variance.sanka/45-minc-subst/renderings-cropped/116078.inferred.0000.jpg">
+        </td>
+      </tr>
+      <tr>
+        <th>
+          <button class="annotate-btn btn btn-outline-danger">Wrong Material</button>
+        </th>
+        <td>Wrong material predictions e.g. metal instead of leather</td>
+        <td class="example-td">
+          <img class="exemplar-img" src="http://localhost:9999/data/terial/exemplars/7429/cropped.jpg">
+          <img
+              src="http://localhost:9999/static-terial/brdf-classifier/inference/20180516-500x500/20180527.022554.resnet34.opensurface_pretrained_on_substance_only.subst_loss=fc.color_loss=none.lab_10,10,10_1.0,1.0,1.0.lr=0.0001.mask_noise_p=0.0.use_variance.sanka/45/renderings-cropped/34087.inferred.0000.jpg">
+          <img class="exemplar-img" src="http://localhost:9999/data/terial/exemplars/1932/cropped.jpg">
+          <img
+              src="http://localhost:9999/static-terial/brdf-classifier/inference/20180516-500x500/20180527.022554.resnet34.opensurface_pretrained_on_substance_only.subst_loss=fc.color_loss=none.lab_10,10,10_1.0,1.0,1.0.lr=0.0001.mask_noise_p=0.0.use_variance.sanka/45/renderings-cropped/14162.inferred.0000.jpg">
+        </td>
+      </tr>
+      <tr>
+        <th>
+          <button class="annotate-btn btn btn-outline-secondary">Bad Shape</button>
+        </th>
+        <td>
+          Shape is bad quality (nothing we can do)
+          <ul>
+            <li>Low poly, very unrealistic</li>
+            <li>Is not a chair</li>
+            <li>Buggy mesh (wrong normals etc)</li>
+          </ul>
+        </td>
+        <td class="example-td">
+          <img src="http://localhost:9999/static-terial/brdf-classifier/inference/20180516-500x500/20180527.022554.resnet34.opensurface_pretrained_on_substance_only.subst_loss=fc.color_loss=none.lab_10,10,10_1.0,1.0,1.0.lr=0.0001.mask_noise_p=0.0.use_variance.sanka/45/renderings-cropped/126732.inferred.0000.jpg">
+          <img src="http://localhost:9999/static-terial/brdf-classifier/inference/20180516-500x500/20180527.022554.resnet34.opensurface_pretrained_on_substance_only.subst_loss=fc.color_loss=none.lab_10,10,10_1.0,1.0,1.0.lr=0.0001.mask_noise_p=0.0.use_variance.sanka/45/renderings-cropped/123345.inferred.0000.jpg">
+        </td>
+      </tr>
+      <tr>
+        <th>
+          <button class="annotate-btn btn btn-outline-secondary">Bad Exemplar</button>
+        </th>
+        <td>
+          Exemplar is bad quality.
+          <ul>
+            <li>Watermarks</li>
+            <li>Low resolution</li>
+            <li>Cut off</li>
+          </ul>
+        </td>
+        <td class="example-td">
+          <img class="exemplar-img" src="http://localhost:9999/data/terial/exemplars/18851/cropped.jpg">
+          <img class="exemplar-img" src="http://localhost:9999/data/terial/exemplars/2254/cropped.jpg">
+          <img class="exemplar-img" src="http://localhost:9999/data/terial/exemplars/14046/cropped.jpg">
+        </td>
+      </tr>
+    </table>
+
+    <div id="controls-div">
+      <a href="{{ url('evaluation_annotate').with_query(request.query) }}" id="prev-shape-btn" class="btn btn-primary">Start</a>
+    </div>
+
+    <div id="result-div">
+    </div>
+
+  </div>
+
+{% endblock %}

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Shape Grid | Terial</title>
+  <style>
+    body {
+      font-size: 0;
+    }
+    img {
+      width: 50px;
+      padding: 0;
+    }
+  </style>
+</head>
+<body>
+
+
+{% for shape in shapes %}
+  <img class="card-img-top"
+       src="{{ nginx_url(shape.get_data_path(config.SHAPE_REND_PHONG_NAME)) }}"/>
+{% endfor %}
+
+</body>
+</html>

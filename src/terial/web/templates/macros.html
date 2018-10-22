@@ -1,0 +1,49 @@
+
+{% macro pagination_bar(cur_page, n_pages, url_name, n_display=10,
+                        page_size=25, query={}) %}
+    {% if False %}{{ kwargs }}{% endif %}
+    <nav>
+      <ul class="pagination justify-content-center">
+        <li class="page-item {{ 'disabled' if cur_page == 0 else '' }}">
+          <a class="page-link"
+             href="{{
+                 url(url_name, **kwargs)
+                   .with_query(merge_dicts(query, {'page': 0, 'page_size': page_size}))
+                 }}"><i class="fas fa-angle-double-left"></i></a>
+        </li>
+        <li class="page-item {{ 'disabled' if cur_page == 0 else '' }}">
+          <a class="page-link"
+             href="{{
+                 url(url_name, **kwargs)
+                   .with_query(merge_dicts(query, {'page': cur_page - 1, 'page_size': page_size}))
+                 }}">
+            <i class="fas fa-angle-left"></i>
+          </a>
+        </li>
+        {% for page in get_pages(cur_page, n_pages, n_display) %}
+          <li class="page-item {{ "active" if page == cur_page else "" }}">
+            <a class="page-link" href="{{
+                url(url_name, **kwargs)
+                  .with_query(merge_dicts(query, {'page': page, 'page_size': page_size}))
+                }}">
+              {{ page }}
+            </a>
+          </li>
+        {% endfor %}
+        <li class="page-item {{ 'disabled' if cur_page == n_pages - 1 else '' }}">
+          <a class="page-link"
+             href="{{
+                 url(url_name, **kwargs)
+                   .with_query(merge_dicts(query, {'page': cur_page + 1, 'page_size': page_size}))
+                 }}"><i class="fas fa-angle-right"></i></a>
+        </li>
+        <li class="page-item {{ 'disabled' if cur_page == n_pages - 1 else '' }}">
+          <a class="page-link"
+             href="{{
+                 url(url_name, **kwargs)
+                   .with_query(merge_dicts(query, {'page': n_pages - 1, 'page_size': page_size}))
+                 }}"><i class="fas fa-angle-double-right"></i></a>
+        </li>
+      </ul>
+    </nav>
+{% endmacro %}

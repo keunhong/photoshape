@@ -1,0 +1,107 @@
+{% extends 'layout.html' %}
+{% import "macros.html" as macros %}
+
+{% block title %}Dataset Images{% endblock %}
+
+{% block head %}
+  <style type="text/css">
+    .wrapper {
+      padding-top: 20px;
+      width: 95vw;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .renderings-wrapper {
+      text-align: center;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .rendering-div {
+      margin: 5px;
+      width: 384px;
+      overflow: hidden;
+    }
+
+  </style>
+{% endblock %}
+
+
+{% block content %}
+  <div class="wrapper">
+
+    <p>Showing {{ paths|length }} of {{ n_total }} renderings.</p>
+
+    {{ macros.pagination_bar(cur_page, n_pages, 'classifier_search_dataset',
+                             page_size=page_size, n_display=10, dataset_name=dataset_name,
+                             query=query) }}
+
+    <div class="renderings-wrapper">
+      {% for rendering in renderings %}
+        {% set param_dict = rendering.load_params() %}
+        {% set ldr_path_small = rendering.get_ldr_path((384, 384)) %}
+        {% set ldr_path = rendering.get_ldr_path((500, 500)) %}
+        {% set seg_vis_path_small = rendering.get_segment_vis_path((384, 384)) %}
+        {% set seg_vis_path = rendering.get_segment_vis_path((500, 500)) %}
+
+        <div class="card rendering-div">
+          <a href="{{ nginx_url(ldr_path) }}" data-toggle="lightbox">
+            <img class="card-img-top" src="{{ nginx_url(ldr_path) }}"/>
+          </a>
+          <a href="{{ nginx_url(seg_vis_path) }}" data-toggle="lightbox">
+            <img class="card-img-top" src="{{ nginx_url(seg_vis_path_small) }}"/>
+          </a>
+          <div class="card-body">
+            <div class="card-text">
+              <table class="table table-bordered table-sm">
+                <tbody>
+                <tr>
+                  <th>ID</th>
+                  <td>{{ rendering.id }}</td>
+                </tr>
+                <tr>
+                  <th>Pair</th>
+                  <td>{{ rendering.pair_id }}</td>
+                </tr>
+                <tr>
+                  <th>Exemplar</th>
+                  <td>{{ param_dict['exemplar_id'] }}</td>
+                </tr>
+                <tr>
+                  <th>Shape</th>
+                  <td>{{ param_dict['shape_id'] }}</td>
+                </tr>
+                <tr>
+                  <th>Split Set</th>
+                  <td>{{ param_dict['split_set'] }}</td>
+                </tr>
+                <tr>
+                  <th>Envmap</th>
+                  <td>{{ param_dict['envmap']['name'] }}</td>
+                </tr>
+                <tr>
+                  <th>Envmap Scale</th>
+                  <td>{{ param_dict['envmap']['scale'] }}</td>
+                </tr>
+                <tr>
+                  <th>Saturated</th>
+                  <td>{{ '{:.02f}%'.format(100*param_dict['saturated_frac']) }}</td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    {{ macros.pagination_bar(cur_page, n_pages, 'classifier_search_dataset',
+                             page_size=page_size, n_display=10,
+                             dataset_name=dataset_name,
+                             query=query) }}
+
+  </div>
+
+{% endblock %}

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Exemplar Grid | Terial</title>
+  <style>
+    body {
+      font-size: 0;
+    }
+    img {
+      width: 50px;
+      padding: 0;
+      border-top: 1px solid #A4CD39;
+      border-left: 1px solid #A4CD39;
+    }
+  </style>
+</head>
+<body>
+
+
+{% for exemplar in exemplars %}
+  <img class="card-img-top"
+       src="{{ nginx_url(exemplar.cropped_path) }}" />
+{% endfor %}
+
+</body>
+</html>

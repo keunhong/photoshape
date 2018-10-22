@@ -1,0 +1,117 @@
+{% extends 'layout.html' %}
+{% import "macros.html" as macros %}
+
+{% block title %}Classifier Models{% endblock %}
+
+{% block head %}
+  <style type="text/css">
+    .wrapper {
+      padding: 20px 10px;
+    }
+
+    .models-table {
+      font-size: 9px !important;
+      border-spacing: 0 !important;
+    }
+
+    .models-table td table {
+      width: 100%;
+    }
+
+    .models-table td table td, .models-table td table th {
+      {#padding: 3px !important;#}
+      width: 100%;
+    }
+
+    .param-name-th {
+      width: 150px;
+    }
+
+    .stat-name-th {
+      width: 120px;
+    }
+  </style>
+
+{#  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/dt-1.10.16/datatables.min.css"/>#}
+{#  <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.16/datatables.min.js"></script>#}
+
+  <script>
+    $(document).ready(function () {
+
+      {% for snapshot_name, model_list in models_by_snapshot.items() %}
+        $('#{{ snapshot_name }}-table').DataTable({
+          pageLength: 25,
+          order:[],
+        });
+      {% endfor %}
+    });
+  </script>
+
+{% endblock %}
+
+{% block content %}
+  <div class="wrapper">
+    <h1>Snapshot Models</h1>
+    {% for snapshot_name, model_list in models_by_snapshot.items() %}
+      <h2>{{ snapshot_name }}</h2>
+      <table class="models-table table table-striped table-sm"
+             id="{{ snapshot_name }}-table"
+             data-sorting="true"
+             data-filtering="true">
+        <thead>
+        <tr>
+          <th>name</th>
+          <th>base_model</th>
+          <th>init_lr</th>
+          <th>use_variance</th>
+          <th>substance_loss</th>
+          <th>color_loss</th>
+          <th>color_space</th>
+          <th>color_shape</th>
+          <th>color_sigma</th>
+          <th style="width: 75px">best_epoch</th>
+          {% for stat in ['mat@1', 'mat@5', 'subst@1', 'mat_subst@1'] %}
+            <th>{{ stat }} train</th>
+            <th>{{ stat }} val</th>
+          {% endfor %}
+        </tr>
+        </thead>
+        {% for model in model_list %}
+          {% set params = model['params'] %}
+          {% set train_stats = model['best_stats']['train'] if model['best_stats'] %}
+          {% set val_stats = model['best_stats']['validation'] if model['best_stats'] %}
+          <tr>
+            <td>{{ model['model_name'] }}</td>
+            <td>{{ params['base_model'] }}</td>
+            <td>{{ '{:.06f}'.format(params['init_lr']).rstrip('0') }}</td>
+            <td>{{ params['use_variance'] }}</td>
+            <td>{{ params['substance_loss'] }}</td>
+            <td>{{ params['color_loss'] }}</td>
+            <td>{{ params['color_hist_space'] if params['color_loss'] }}</td>
+            <td>{{ params['color_hist_shape'] if params['color_loss'] }}</td>
+            <td>{{ params['color_hist_sigma'] if params['color_loss'] }}</td>
+            <td>
+              {% if model['best_stats'] %}
+                {{ model['best_stats']['epoch'] }}
+              {% endif %}
+            </td>
+            {% for stat in ['mat_prec1', 'mat_prec5', 'subst_fc_prec1', 'subst_from_mat_prec1'] %}
+              <td>
+                {% if model['best_stats'] and stat in train_stats %}
+                  {{ '{:02.02f}%'.format(train_stats[stat]) }}
+                {% endif %}
+              </td>
+              <td>
+                {% if model['best_stats'] and stat in train_stats %}
+                  {{ '{:02.02f}%'.format(val_stats[stat]) }}
+                {% endif %}
+              </td>
+            {% endfor %}
+          </tr>
+        {% endfor %}
+      </table>
+    {% endfor %}
+
+  </div>
+
+{% endblock %}

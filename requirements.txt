@@ -1,0 +1,20 @@
+-e git+https://github.com/pytorch/tnt.git#egg=Package
+aiohttp==3.1.2
+aiohttp-jinja2==0.16.0
+attrs==17.4.0
+click==6.7
+dask==0.16.1
+Jinja2==2.10
+jsonschema==2.6.0
+numpy==1.14.0
+opencv-python==3.4.0.12
+psycopg2-binary==2.7.4
+-e git+https://github.com/lucasb-eyer/pydensecrf.git#egg=Package
+-e git+https://github.com/mcfletch/pyopengl.git#egg=Package
+python-dateutil==2.6.1
+-e git+https://github.com/scikit-image/scikit-image.git#egg=Package
+scikit-learn==0.19.1
+SQLAlchemy==1.2.2
+structlog==18.1.0
+tqdm==4.19.5
+visdom==0.1.7
