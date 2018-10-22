@@ -33,15 +33,6 @@ class RendNet3(nn.Module):
             }.get(checkpoint['params'].get('base_model', 'resnet18'))
         else:
             base_model_fn = resnet.resnet18
-            # model_params = dict(
-            #     num_classes=num_classes,
-            #     num_substances=len(SUBSTANCES),
-            #     num_roughness_classes=num_roughness_classes,
-            #     output_roughness=output_roughness,
-            #     output_substance=output_substance,
-            #     output_color=color_binner is not None,
-            #     num_color_bins=color_binner.size if color_binner else 0,
-            # )
 
         model = cls(num_classes=num_classes,
                     num_roughness_classes=num_roughness_classes,

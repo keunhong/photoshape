@@ -180,6 +180,13 @@ python -m terial.shapes.link_shapenet
 
 ### Materials
 
+You can download the preview renders
+
+```bash
+cd data/blobs
+curl -L -O https://homes.cs.washington.edu/~kpar/photoshape/blobs/materials.tar.gz
+tar cvzf materials.tar.gz
+```
 
 #### Adobe Stock
 Materials from Adobe Stock are subject to copyright and must be downloaded from their source. Please refer
@@ -310,6 +317,18 @@ Contains meta-data for the materials.
 ### `labels.json`
 This contains the mapping from `material_id` to output class labels for the material classifier.
 
+
+## Material Classifier
+
+The weights for our 
+Download the our network parameters
+
+```bash
+mkdir -p data/classifier
+cd data/classifier
+curl -L -O https://homes.cs.washington.edu/~kpar/photoshape/classifier/model.tar.gz
+tar xvzf model.tar.gz
+```
 
 
 

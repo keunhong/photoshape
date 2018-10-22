@@ -13,9 +13,8 @@ import numpy as np
 from terial import models
 from terial.classifier.inference.utils import compute_weighted_scores_single
 from terial.classifier.network import RendNet3
-from terial.classifier.utils import ColorBinner
 from terial.database import session_scope
-from terial.classifier import utils, transforms
+from terial.classifier import transforms
 from terial.config import SUBSTANCES
 
 vis = visdom.Visdom(env='classifier-infer-one')
@@ -25,6 +24,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--checkpoint-path', type=Path)
 parser.add_argument(dest='image_path', type=Path)
 parser.add_argument(dest='mask_path', type=Path)
+parser.add_argument('--cuda', action='store_true')
 args = parser.parse_args()
 
 
@@ -62,10 +62,7 @@ def main():
 
     print(image.dtype, image.shape, mask.dtype)
 
-    base_dir = checkpoint_path.parent.parent.parent.parent
-    snapshot_name = checkpoint_path.parent.parent.name
-    lmdb_dir = (base_dir / 'lmdb' / snapshot_name)
-    with (lmdb_dir / 'meta.json').open('r') as f:
+    with (checkpoint_path.parent / 'meta.json').open('r') as f:
         meta_dict = json.load(f)
         mat_id_to_label = meta_dict['mat_id_to_label']
         label_to_mat_id = {v: k for k, v in mat_id_to_label.items()}
@@ -73,21 +70,13 @@ def main():
     with (checkpoint_path.parent / 'model_params.json').open('r') as f:
         model_params = json.load(f)
 
-    color_binner = None
-    if 'color_hist_space' in model_params:
-        color_binner = ColorBinner(
-            space=model_params['color_hist_space'],
-            shape=tuple(model_params['color_hist_shape']),
-            sigma=tuple(model_params['color_hist_sigma']),
-        )
-
     print(f'Loading checkpoint from {checkpoint_path!s}')
     checkpoint = torch.load(checkpoint_path)
 
-
     model = RendNet3.from_checkpoint(checkpoint)
     model.train(False)
-    model = model.cuda()
+    if args.cuda:
+        model = model.cuda()
 
     with session_scope() as sess:
         materials = sess.query(models.Material).all()
@@ -98,7 +87,6 @@ def main():
 
     topk_dict = compute_topk(
         label_to_mat_id, model, image, mask,
-        color_binner=color_binner,
         mat_by_id=mat_by_id)
 
     compute_weighted_scores_single(topk_dict, mat_by_id, sort=True,
@@ -128,7 +116,6 @@ def compute_topk(label_to_mat_id,
                  image,
                  seg_mask,
                  *,
-                 color_binner,
                  mat_by_id):
     if image.dtype != np.uint8:
         image = (image * 255).astype(np.uint8)
@@ -141,17 +128,11 @@ def compute_topk(label_to_mat_id,
         input_size=224, output_size=224, pad=0, to_pil=True)(image)
     mask_tensor = transforms.inference_mask_transform(
         input_size=224, output_size=224, pad=0)(seg_mask)
-    input_tensor = (torch.cat((image_tensor, mask_tensor), dim=0)
-                    .unsqueeze(0).cuda())
+    input_tensor = torch.cat((image_tensor, mask_tensor), dim=0).unsqueeze(0)
+    if args.cuda:
+        input_tensor = input_tensor.cuda()
 
     output = model.forward(input_tensor)
-
-    if 'color' in output:
-        color_output = output['color']
-        color_hist_vis = color_binner.visualize(
-            F.softmax(color_output[0].cpu().detach(), dim=0))
-        vis.heatmap(color_hist_vis, win='color-hist',
-                    opts=dict(title='Color Histogram'))
 
     topk_mat_scores, topk_mat_labels = torch.topk(
         F.softmax(output['material'], dim=1), k=output['material'].size(1))

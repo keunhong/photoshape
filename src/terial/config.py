@@ -21,7 +21,7 @@ WEB_ROOT = 'http://localhost/static'
 """
 Directory configuration
 """
-LOCAL_ROOT = Path('/local1/kpar/data')
+LOCAL_ROOT = Path('/home/kpar/projects/photoshape/data')
 REMOTE_ROOT = Path('/projects/grail/kparnb/data')
 
 # The directory where blob data associated with DB rows will be stored.
