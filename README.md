@@ -130,7 +130,7 @@ We've preprocessed exemplar images. Download them to `data/blobs`
 
 ```bash
 cd data/blobs
-curl -L -O https://homes.cs.washington.edu/~kpar/photoshape/exemplars.tar.gz
+curl -L -O https://homes.cs.washington.edu/~kpar/photoshape/blobs/exemplars.tar.gz
 tar xvzf exemplars.tar.gz
 ```
 
