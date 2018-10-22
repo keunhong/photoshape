@@ -332,7 +332,29 @@ curl -L -O https://homes.cs.washington.edu/~kpar/photoshape/classifier/model.tar
 tar xvzf model.tar.gz
 ```
 
+### Example Inference
 
+Let's try to infer the materials on our sample input in `data/classifier/input`. For this example you'll need the 
+material blobs downloaded as above and the `config.py` set up properly. You'll also need to have set up the database
+since the script will query the database for the materials.
 
+We'll show the inference results using visdom. Please install visdom, and have it running in the background somewhere:
 
+```bash
+pip install visdom
+python -m visdom.server
+``` 
+
+Now you can run the example script:
+
+```bash
+python -m terial.classifier.inference.infer_one \
+  --checkpoint-path data/classifier/model/model_best.pth.tar \
+  data/classifier/inputs/chair1.png \
+  data/classifier/inputs/chair1.mask.png
+```
+
+You should see the following in visdom if everything works correctly:
+
+![Inference Results](docs/example_inference.png)
 
