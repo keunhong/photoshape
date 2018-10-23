@@ -71,7 +71,10 @@ def main():
         model_params = json.load(f)
 
     print(f'Loading checkpoint from {checkpoint_path!s}')
-    checkpoint = torch.load(checkpoint_path)
+    if args.cuda:
+        checkpoint = torch.load(checkpoint_path)
+    else:
+        checkpoint = torch.load(checkpoint_path, map_location='cpu')
 
     model = RendNet3.from_checkpoint(checkpoint)
     model.train(False)
