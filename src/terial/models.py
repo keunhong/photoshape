@@ -10,7 +10,6 @@ from sqlalchemy import func
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import relationship
 
-import mdl
 import terial.database as db
 import toolbox.io
 import toolbox.io.images
@@ -252,49 +251,6 @@ class Material(db.Base, BlobDataMixin, SerializeMixin):
                         f'AdobeStock_{self.source_id}', f'{self.name}.mdl')
         else:
             return None
-
-    def load_base_color(self):
-        base_path = self.get_base_path()
-        if self.type == MaterialType.AITTALA_BECKMANN:
-            # Scale the Aittala materials as they are too bright.
-            base_color = (
-                        toolbox.io.images.imread2(base_path / 'map_diffuse.exr')
-                        * 0.3)
-        elif self.type == MaterialType.VRAY:
-            base_color = base_path / 'output.VRayDiffuseFilter.0000.exr'
-        elif self.type == MaterialType.POLIIGON:
-            try:
-                diffuse_map_path = list(base_path.glob('*COL_VAR2_*.jpg'))[0]
-            except IndexError:
-                diffuse_map_path = list(base_path.glob('*COL*.jpg'))[0]
-            return toolbox.io.images.imread2(diffuse_map_path)
-        elif self.type == MaterialType.MDL:
-            parsed_dict = mdl.parse_mdl(base_path)
-            base_color = parsed_dict['base_color']
-            if isinstance(base_color, str):
-                base_color = base_path.parent / base_color
-        elif self.type == MaterialType.PRINCIPLED:
-            base_color = self.params['diffuse_color']
-        elif self.type == MaterialType.BLINN_PHONG:
-            base_color = self.params['diffuse']
-        else:
-            raise NotImplementedError()
-
-        if isinstance(base_color, np.ndarray):
-            return base_color
-
-        if isinstance(base_color, tuple) or isinstance(base_color, list):
-            if isinstance(base_color[0], str):
-                base_color = tuple(float(s) for s in base_color)
-            if isinstance(base_color[0], int):
-                return np.array(base_color[:3]).reshape(1, 1, 3) / 255.0
-            else:
-                return np.array(base_color[:3]).reshape(1, 1, 3)
-        elif isinstance(base_color, Path):
-            return toolbox.io.images.imread2(base_color)
-
-        raise NotImplementedError(f'Unknown type {type(base_color)}')
-
 
     def serialize(self):
         return {
