@@ -10,7 +10,7 @@ If you find PhotoShape useful, please consider citing:
 
 ```bibtex
 @article{photoshape2018,
- author = {Park, Keunhong and Rematas, Konstantinos and Farhadi, Ali and Seitz, Steven Mm},
+ author = {Park, Keunhong and Rematas, Konstantinos and Farhadi, Ali and Seitz, Steven M.},
  title = {PhotoShape: Photorealistic Materials for Large-Scale Shape Collections},
  journal = {ACM Trans. Graph.},
  issue_date = {November 2018},
