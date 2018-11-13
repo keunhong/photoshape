@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Extract Materials</title>
+        <h1>Extract Materials</h1>
+    </head>
+
+    <body>
+    {% block content %}{% endblock content %}
+    </body>
+</html>
+
+{% load staticfiles %}
+
+<link rel="stylesheet" type="text/css" href="{% static '/homepage.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static '/croppie.css' %}" />
+<script class="jsbin" src="https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+<script src={% static '/croppie.js' %}></script>
+<script src={% static '/homepage.js' %}></script>

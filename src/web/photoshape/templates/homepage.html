@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="file-upload">
+
+      <button class="file-upload-btn" type="button" onclick="$('.file-upload-input').trigger( 'click' )">Add Image</button>
+    <div class="image-upload-wrap">
+    <input class="file-upload-input" type='file' onchange="readURL(this);" accept="image/*" />
+
+  </div>
+        <button id="crop-btn" style="display:none" class="file-upload-btn" type="button" onclick="showCropped();">Crop</button>
+        <div id="canvasDiv"></div>
+  <div id="file-upload-content">
+    <img id="upload-image" src="#" alt="your image" />
+    <div id="image-title-wrap">
+    </div>
+  </div>
+  <div id="cropped">
+
+  </div>
+  <div id="controls" style="display:none"> 
+    <p>Please draw on the area you want to analyze and click "Infer"</p>
+    <button id="undo-btn" type="button">Undo</button>
+    <button id="clear-btn" type="button">Clear</button>
+    <button id="infer" class="file-upload-btn" type="button" onclick="infer();">Infer</button>
+  </div>
+
+
+</div>
+<h2 id="load" style="display:none">Loading...</h2>
+<h2 id="error" style="display:none"></h2>
+<div class="file-upload" id="results">
+  <div id="original">
+    
+    
+  </div>
+
+  <div id="infer_results">
+    
+    
+  </div>
+
+<button id="submit_btn" class="file-upload-btn" type="submit" style="display:none">Submit</button>
+
+</div>
+
+{% endblock %}
