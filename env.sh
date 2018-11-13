@@ -4,7 +4,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 echo $DIR
 
-pyenv activate terial
+pyenv activate photoshape
 
 export PYTHONPATH=$DIR/src:$PYTHONPATH
 export PYTHONPATH=$DIR/thirdparty/pyhog:$PYTHONPATH

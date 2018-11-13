@@ -10,7 +10,7 @@ If you find PhotoShape useful, please consider citing:
 
 ```bibtex
 @article{photoshape2018,
- author = {Park, Keunhong and Rematas, Konstantinos and Farhadi, Ali and Seitz, Steven Mm},
+ author = {Park, Keunhong and Rematas, Konstantinos and Farhadi, Ali and Seitz, Steven M.},
  title = {PhotoShape: Photorealistic Materials for Large-Scale Shape Collections},
  journal = {ACM Trans. Graph.},
  issue_date = {November 2018},
@@ -83,9 +83,6 @@ First we have to fetch this codebase.
 # Clone this repository
 git clone git@github.com:keunhong/photoshape.git
 git submodule update --init --recursive
-
-# Extract metadata
-cd resources && tar xvzf metadata.tar.gz && cd ..
 ```
 
 
@@ -93,7 +90,7 @@ cd resources && tar xvzf metadata.tar.gz && cd ..
 
 To facilitate efficient querying and data storage we use PostgreSQL for most metadata.
 
-First install [docker](https://docs.docker.com/install/linux/docker-ce/ubuntu/) and [docker-compose](https://docs.docker.com/install/linux/docker-ce/ubuntu/) following the instructions linked.
+First install [docker](https://docs.docker.com/install/linux/docker-ce/ubuntu/) and [docker-compose](https://docs.docker.com/compose/install/) following the instructions linked.
 Once you have those installed, run the database using the following command:
 
 ```bash
@@ -111,7 +108,7 @@ docker exec -i $(docker-compose ps -q postgres) psql -U photoshape_user photosha
 docker exec -i $(docker-compose ps -q postgres) psql -U photoshape_user photoshape_db < data/postgres/exemplars.sql
 docker exec -i $(docker-compose ps -q postgres) psql -U photoshape_user photoshape_db < data/postgres/shapes.sql
 docker exec -i $(docker-compose ps -q postgres) psql -U photoshape_user photoshape_db < data/postgres/materials.sql
-docker exec -i $(docker-compose ps -q postgres) psql -U photoshape_user photoshape_db < data/postgres/exemplar_shape_pair.sql
+docker exec -i $(docker-compose ps -q postgres) psql -U photoshape_user photoshape_db < data/postgres/exemplar_shape_pairs.sql
 ```
 
 ### Configuration
@@ -196,7 +193,7 @@ You can download the preview renders
 ```bash
 cd data/blobs
 curl -L -O https://homes.cs.washington.edu/~kpar/photoshape/blobs/materials.tar.gz
-tar cvzf materials.tar.gz
+tar xvzf materials.tar.gz
 ```
 
 #### Adobe Stock
