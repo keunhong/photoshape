@@ -41,8 +41,8 @@ pyenv update
 sudo apt-get install -y make build-essential libssl-dev zlib1g-dev libbz2-dev \
 libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev \
 xz-utils tk-dev libffi-dev liblzma-dev
-pyenv install 3.7.0
-pyenv virtualenv 3.7.0 photoshape
+pyenv install 3.7.1
+pyenv virtualenv 3.7.1 photoshape
 
 # Enter the environment and set paths
 source env.sh
