@@ -44,6 +44,5 @@ tornado==5.0.1
 tqdm==4.19.5
 traitlets==4.3.2
 ujson==1.35
-urllib3==1.22
 uvloop==0.9.1
 visdom==0.1.7
