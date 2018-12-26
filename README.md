@@ -50,6 +50,12 @@ source env.sh
 
 ### Install Dependencies
 
+### Non-Python Dependencies
+ * Blender 2.79 or higher
+ * Docker and Docker-Compose
+ * NVIDIA GPU compatible with PyTorch and OpenGL rendering.
+
+#### Python Dependencies
 If you just need to use the network, all you'll need is the basic dependencies.
 
 ```bash
