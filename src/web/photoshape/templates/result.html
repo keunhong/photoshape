@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+  <div id="uploaded_img">
+    <img id="croppr" src="{{ url }}" alt="your image" />
+    
+  </div>
+<div class="file-upload">
+
+{% if materials %}
+<h2>Results</h2>
+{% for material_id, material_substance in materials %}
+<div style="float:left;">
+<div>{{material_substance}}</div>
+<img src="/images/materials/{{material_id}}/images/previews/bmps.png" alt="material {{material_id}}" height="150" width="150"/>
+<input type="radio" name="result" value="{{material_id}}"><br>
+</div>
+{% endfor %}
+<button class="file-upload-btn" type="submit">Submit</button>
+{% endif %}
+<div id="models"></div>
+</div>
+
+{% endblock %}

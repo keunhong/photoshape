@@ -43,6 +43,7 @@ $uploadCrop = $('#upload-image').croppie({
 function result(data){
   ids = data['materials']
   url = data['url']
+  fid = data['form']
   text = "<h2>Your image:</h2><img id='original' src=" + url + " alt='your image' />"
   $('#original').html(text)
   var results = document.getElementById("infer_results");
@@ -51,20 +52,35 @@ function result(data){
   results.appendChild(title);
 
   for (var i = 0; i < ids.length; i++) {
-    id = ids[i]
+    id = ids[i][0]
+    name = ids[i][1]
     var res_container = document.createElement("div")
     res_container.className = "res_container"
+    var res_label = document.createElement("label")
+    res_label.htmlFor = id
+    res_label.innerHTML = name
     var res_img = document.createElement("img")
     res_img.className = "res_img"
-    res_img.src = "/images/materials/" + id +"/images/previews/bmps.png" 
+    res_img.src = "/images/materials/" + id +"/images/previews/bmps.png"
+    res_img.id = id
     var res_input = document.createElement("input")
     res_input.type = "radio"
     res_input.name = "result"
     res_input.value = id
+    res_container.appendChild(res_label);
     res_container.appendChild(res_img);
     res_container.appendChild(res_input);
     results.appendChild(res_container);
   }
+  var form_id = document.createElement("input")
+  form_id.name = "form_id"
+  form_id.type = "hidden"
+  form_id.value = fid
+  var submit_btn = document.createElement("input")
+  submit_btn.type = "submit"
+  submit_btn.style = "display:none"
+  results.appendChild(form_id)
+  results.appendChild(submit_btn)  
   $('#submit_btn').show();
 }
 
@@ -135,6 +151,10 @@ function readURL(input) {
 
 }
 
+function submitResult() {
+   document.forms[0].submit();
+}
+
 function infer() {
     var fd = new FormData();
     var filename = document.getElementById('image-title-wrap').innerHTML;
@@ -178,8 +198,8 @@ var canvas, ctx,
     brush = {
         x: 0,
         y: 0,
-        color: '#000000',
-        size: 10,
+        color: '#ffffff',
+        size: 20,
         down: false,
     },
     strokes = [],

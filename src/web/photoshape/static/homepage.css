@@ -3,6 +3,8 @@ h1, h2, #uploaded_img, #cropped, #original, #infer_results {
 }
 .res_container {
   float: left;
+  display: grid;
+  padding: 10px;
 }
 .res_img {
    height: 150px; 

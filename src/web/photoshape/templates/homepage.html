@@ -5,6 +5,9 @@
 
       <button class="file-upload-btn" type="button" onclick="$('.file-upload-input').trigger( 'click' )">Add Image</button>
     <div class="image-upload-wrap">
+    {% if content %}
+    <div style="color:red">{{ content }}</div>
+    {% endif %}
     <input class="file-upload-input" type='file' onchange="readURL(this);" accept="image/*" />
 
   </div>
@@ -35,12 +38,9 @@
     
   </div>
 
-  <div id="infer_results">
-    
-    
-  </div>
-
-<button id="submit_btn" class="file-upload-btn" type="submit" style="display:none">Submit</button>
+  <form id="infer_results" action='/' method="POST">
+  </form>
+<button id="submit_btn" class="file-upload-btn" onclick="submitResult();" style="display:none">Submit</button>
 
 </div>
 
