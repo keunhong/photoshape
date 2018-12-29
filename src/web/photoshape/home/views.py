@@ -119,6 +119,6 @@ def find_match_models(original):
 	image_path = current_path + '/../images/'+ original
 	pairs = match_models.compute_pair(image_path)
 	for pair in pairs:
-		models.add((str(pair.shape_id), pair.elevation, pair.azimuth))
+		models.append((str(pair.shape_id), pair.elevation, pair.azimuth))
 	return models
 
