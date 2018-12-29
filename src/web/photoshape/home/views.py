@@ -6,6 +6,8 @@ import os
 import sys
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + '/../../../terial/classifier/inference')
 # sys.path.append(os.path.dirname(os.path.abspath(__file__)) + '/../../../../data/json')
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) + '/../../../terial/')
+import match_models
 import infer_one_web 
 from pathlib import Path
 from PIL import Image
@@ -113,9 +115,10 @@ def infer_results(original, mask):
 
 def match_models(original):
 	models = []
+	current_path = os.path.dirname(os.path.abspath(__file__))
 	image_path = current_path + '/../images/'+ original
 	pairs = match_models.compute_pair(image_path)
 	for pair in pairs:
-        models.add((str(pair.shape_id), pair.elevation, pair.azimuth))
+		models.add((str(pair.shape_id), pair.elevation, pair.azimuth))
 	return models
 
