@@ -19,5 +19,74 @@
 {% endif %}
 <div id="models"></div>
 </div>
+		<script src="js/three.js"></script>
+		<script src="js/OBJLoader.js"></script>
+		<script>
+			var scene = new THREE.Scene();
+			var camera = new THREE.PerspectiveCamera( 50, window.innerWidth/window.innerHeight, 0.1, 1000 );
+
+			var ambient = new THREE.AmbientLight( 0x444444 );
+			scene.add( ambient );
+			var directionalLight = new THREE.DirectionalLight( 0xffeedd );
+			directionalLight.position.set( 0, 0, 1 ).normalize();
+			scene.add( directionalLight );
+
+			var renderer = new THREE.WebGLRenderer();
+			renderer.setSize( window.innerWidth/2, window.innerHeight/2 );
+			document.getElementById("models").appendChild( renderer.domElement );
+
+
+			var loader = new THREE.OBJLoader();
+			var model;
+
+			var index = 0;
+			var files = [];
+			var elevations = [];
+			var azimuths = [];
+
+			var objLoader = new THREE.OBJLoader();
+
+			function loadNextFile() {
+
+			  if (index > files.length - 1) {
+			  	animate();
+			  	return;
+			  }
+
+			  objLoader.load(files[index], function(object) {
+		    	model = object;
+				scene.add(object);
+				model.position.x += index-2;		
+				model.rotation.y += azimuths[index]-0.5*Math.PI;
+				model.rotation.x += 0.5*Math.PI - elevations[index];
+				index++;
+			    loadNextFile();
+
+			  },
+			  	function ( xhr ) {
+					console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+				},
+				function ( error ) {
+					console.log( 'An error happened' );
+				});
+
+			}
+
+			{% for id, phi, theta in models %}
+			files.push('/local1/photoshape/blobs/shapes/'+id+'/models/uvmapped_v2.obj');
+			elevations.push(phi);
+			azimuths.push(theta)
+			loadNextFile();
+			{% endfor %}			
+			
+
+			camera.position.z = 2;
+
+			var animate = function () {
+				renderer.render( scene, camera );
+			};
+
+		</script>
 
 {% endblock %}

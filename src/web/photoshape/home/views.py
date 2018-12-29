@@ -44,13 +44,14 @@ def display_results(request):
 			mask = form.instance.mask.name
 			context={'url':form.instance.original.url}
 			materials = infer_results(original, mask)
-
+			models = match_models(original)
 			# create or get Material instance
 			for m_id, name in materials:
 				m, _ = Material.objects.get_or_create(mid=m_id)
 				form.instance.computed_materials.add(m)
 			context['materials'] = materials
 			context['form'] = form.instance.pk
+			context['models'] = models
 			return HttpResponse(json.dumps(context))
 		else:
 			print(form.errors)
@@ -109,4 +110,12 @@ def infer_results(original, mask):
 		m_name = data[str(m_id)]['name']
 		materials.append((m_id, m_name))
 	return materials
+
+def match_models(original):
+	models = []
+	image_path = current_path + '/../images/'+ original
+	pairs = match_models.compute_pair(image_path)
+	for pair in pairs:
+        models.add((str(pair.shape_id), pair.elevation, pair.azimuth))
+	return models
 
