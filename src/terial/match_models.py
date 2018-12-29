@@ -77,7 +77,7 @@ def compute_feat_dists(batch_feats, image_feats):
         *batch_feats.size())).pow(2).sum(dim=1)
 
 
-def process_exemplar(exemplar_feat, shape_loader, topk, max_dist=40):
+def process_exemplar(exemplar_feat, sess, shape_loader, topk, max_dist=40):
     shape_pbar = tqdm(shape_loader)
 
     best_pairs = []
