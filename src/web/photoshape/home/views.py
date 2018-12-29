@@ -6,9 +6,9 @@ import os
 import sys
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + '/../../../terial/classifier/inference')
 # sys.path.append(os.path.dirname(os.path.abspath(__file__)) + '/../../../../data/json')
+import infer_one_web 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + '/../../../terial/')
 import match_models
-import infer_one_web 
 from pathlib import Path
 from PIL import Image
 import PIL.ImageOps 
@@ -45,8 +45,8 @@ def display_results(request):
 			original = form.instance.original.name
 			mask = form.instance.mask.name
 			context={'url':form.instance.original.url}
+			models = find_match_models(original)
 			materials = infer_results(original, mask)
-			models = match_models(original)
 			# create or get Material instance
 			for m_id, name in materials:
 				m, _ = Material.objects.get_or_create(mid=m_id)
@@ -113,7 +113,7 @@ def infer_results(original, mask):
 		materials.append((m_id, m_name))
 	return materials
 
-def match_models(original):
+def find_match_models(original):
 	models = []
 	current_path = os.path.dirname(os.path.abspath(__file__))
 	image_path = current_path + '/../images/'+ original
