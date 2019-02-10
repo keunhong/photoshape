@@ -5,7 +5,7 @@ from .models import UploadedImage, Material
 # Register your models here.
 class UploadedImageAdmin(admin.ModelAdmin):
 	form = UploadedImageForm
-	fields = ['title', 'original', 'mask', 'computed_materials', 'user_material']
+	fields = ['title', 'original', 'computed_materials', 'user_material']
 
 admin.site.register(UploadedImage, UploadedImageAdmin)
 admin.site.register(Material)

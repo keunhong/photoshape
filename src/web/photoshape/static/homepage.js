@@ -32,6 +32,7 @@ $uploadCrop = $('#upload-image').croppie({
         // these HTTP methods do not require CSRF protection
         return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
     }
+
     $.ajaxSetup({
         beforeSend: function(xhr, settings) {
             if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
@@ -115,7 +116,52 @@ function readURL(input) {
     removeUpload();
   }
 }
+function saveImg() {
+    // For screenshots to work with WebGL renderer, preserveDrawingBuffer should be set to true.
+    // open in new window like this
+    
+//var w = window.open('', '');
+    //w.document.title = "Screenshot";
+    //var img = new Image();
+    //img.src = renderer.domElement.toDataURL();
+    //w.document.body.appendChild(img);
 
+    // download file like this.
+    var a = document.createElement('a');
+    a.href = renderer.domElement.toDataURL().replace("image/png", "image/octet-stream");
+    a.download = 'canvas.png'
+    //a.click();
+    document.getElementById('pic').appendChild(a);
+}
+
+    function saveAsImage() {
+        var imgData, imgNode;
+
+        try {
+            var strMime = "image/png";
+            imgData = renderer.domElement.toDataURL(strMime);
+
+            saveFile(imgData.replace(strMime, "image/octet-stream"), "test.png");
+
+        } catch (e) {
+            console.log(e);
+            return;
+        }
+
+    }
+
+    var saveFile = function (strData, filename) {
+        var link = document.createElement('a');
+        if (typeof link.download === 'string') {
+            document.body.appendChild(link); //Firefox requires the link to be in the body
+            link.download = filename;
+            link.href = strData;
+            link.click();
+            document.body.removeChild(link); //remove the link when done
+        } else {
+            location.replace(uri);
+        }
+    }
   function showCropped() {
 
   // vanilla.result('blob','viewport', 'jpeg').then(function(blob) {
@@ -154,8 +200,49 @@ function readURL(input) {
 function submitResult() {
    document.forms[0].submit();
 }
-
+function back() {
+   location.reload();
+}
 function infer() {
+    var fd = new FormData();
+    var filename = document.getElementById('image-title-wrap').innerHTML;
+    drawEmpty();
+     document.getElementById('canvas').toBlob(function(blob) {
+        maskImage = blob;
+
+    fd.append('original', croppedImage, filename);
+    fd.append('csrfmiddlewaretoken', getCookie('csrftoken'));
+    $('#load').show();
+    var tet = $.ajax({
+        url: '/results/',
+        type: 'POST',
+        data: fd,
+        async: true,
+        contentType: false,
+        enctype: 'multipart/form-data',
+        processData: false,
+        success: function (response) {
+        $("html").html(response);  
+	$('#file-upload-content').hide();
+          //data = JSON.parse(response)
+          $('#load').hide();
+          //result(data)
+        },
+        error: function (error) {
+          $('#load').hide();
+          $('#error').html(error);
+          $('#error').show();
+        }
+    }).responseText;
+
+      }, 'image/png', 1);
+    $('#cropped').html("");
+    $('#controls').hide();
+
+}
+
+
+function infer2() {
     var fd = new FormData();
     var filename = document.getElementById('image-title-wrap').innerHTML;
     drawEmpty();
@@ -167,7 +254,7 @@ function infer() {
     fd.append('csrfmiddlewaretoken', getCookie('csrftoken'));
     $('#load').show();
     var tet = $.ajax({
-        url: '/results/',
+        url: '/results2/',
         type: 'POST',
         data: fd,
         async: true,
@@ -241,9 +328,14 @@ function redraw () {
 
 }
 
+
+
 outlineImage.onload=function() {
   ctx.drawImage(outlineImage, 0, 0, canvas.width(), canvas.height());
 }
+
+
+
 
 function init (url) {
     canvas = $('#canvas');

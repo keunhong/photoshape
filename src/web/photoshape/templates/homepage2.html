@@ -21,12 +21,16 @@
   <div id="cropped">
 
   </div>
-<div id="controls" style="display:none">     
-<button id="infer" class="file-upload-btn" type="button" onclick="infer();">Infer</button> 
-</div>
+  <div id="controls" style="display:none"> 
+    <p>Please draw on the area you want to analyze and click "Infer"</p>
+    <button id="undo-btn" type="button">Undo</button>
+    <button id="clear-btn" type="button">Clear</button>
+    <button id="infer" class="file-upload-btn" type="button" onclick="infer2();">Infer</button>
+  </div>
+
 
 </div>
-<h2 id="load" style="display:none">Loading...(it might take around 20s)</h2>
+<h2 id="load" style="display:none">Loading...</h2>
 <h2 id="error" style="display:none"></h2>
 <div class="file-upload" id="results">
   <div id="original">

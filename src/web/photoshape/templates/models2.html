@@ -6,38 +6,26 @@
     </head>
 
     <body>
-  <div id="uploaded_img">
-    <img id="croppr" src="{{ url }}" alt="your image" />
-    
-  </div>
-<div id="models"></div>
 
-<div class="file-upload">
-
-{% if materials %}
-<h2>Results</h2>
-{% for material_id, material_substance in materials %}
-<div style="float:left;">
-<div>{{material_substance}}</div>
-<img src="/images/materials/{{material_id}}/images/previews/bmps.png" alt="material {{material_id}}" height="150" width="150"/>
-<input type="radio" name="result" value="{{material_id}}"><br>
-</div>
-{% endfor %}
-<button class="file-upload-btn" type="submit">Submit</button>
-{% endif %}</div>
-    </body>
-</html>
-
-{% load staticfiles %}
-
-<link rel="stylesheet" type="text/css" href="{% static '/homepage.css' %}" />
-<link rel="stylesheet" type="text/css" href="{% static '/croppie.css' %}" />
-<script class="jsbin" src="https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
-<script src={% static '/croppie.js' %}></script>
-<script src={% static '/homepage.js' %}></script>
-<script src={% static '/three.js' %}></script>
-<script src={% static  '/OBJLoader.js' %}></script>
-		<script>
+			<style>
+					body { margin: 0; }
+					canvas { width: 100%; height: 100% }
+				</style>
+		<h1>{{ url }}</h1>
+		<div id="models"></div>
+	</body>
+	</html>
+	
+	{% load staticfiles %}
+	
+	<link rel="stylesheet" type="text/css" href="{% static '/homepage.css' %}" />
+	<link rel="stylesheet" type="text/css" href="{% static '/croppie.css' %}" />
+	<script class="jsbin" src="https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+	<script src={% static '/croppie.js' %}></script>
+	<script src={% static '/homepage.js' %}></script>
+	<script src={% static '/three.js' %}></script>
+	<script src={% static  '/OBJLoader.js' %}></script>
+	<script>
 			var scene = new THREE.Scene();
 			var camera = new THREE.PerspectiveCamera( 50, window.innerWidth/window.innerHeight, 0.1, 1000 );
 
@@ -48,7 +36,7 @@
 			scene.add( directionalLight );
 
 			var renderer = new THREE.WebGLRenderer();
-			renderer.setSize( window.innerWidth/2, window.innerHeight/2 );
+			renderer.setSize( window.innerWidth, window.innerHeight );
 			document.getElementById("models").appendChild( renderer.domElement );
 
 
@@ -61,7 +49,7 @@
 			var azimuths = [];
 
 			var objLoader = new THREE.OBJLoader();
-
+			
 			function loadNextFile() {
 
 			  if (index > files.length - 1) {
@@ -70,9 +58,15 @@
 			  }
 
 			  objLoader.load(files[index], function(object) {
-		    	model = object;
+		    		object.traverse(function(node){
+					if (node.material) {
+						node.material.side = THREE.DoubleSide;
+					}
+				})
+				model = object;
+				console.log(files[index])
 				scene.add(object);
-				model.position.x += index-2;		
+				model.position.x += (index-2)/3;		
 				model.rotation.y += azimuths[index]-0.5*Math.PI;
 				model.rotation.x += 0.5*Math.PI - elevations[index];
 				index++;
@@ -86,18 +80,21 @@
 				function ( error ) {
 					console.log( 'An error happened' );
 				});
-
-			}
+	}
 
 			{% for id, phi, theta in models %}
-			files.push('/static/blobs/shapes/'+id+'/models/original.obj');
-			elevations.push(phi);
-			azimuths.push(theta)
-			loadNextFile();
+			//console.log({{ id }})
+			//console.log({{ phi }})
+			//console.log({{ theta }})
+			files.push('/static/blobs/shapes/'+{{ id }}+'/uvmapped.obj');
+			elevations.push({{ phi }});
+			azimuths.push({{ theta }});
 			{% endfor %}			
 			
 
-			camera.position.z = 2;
+			camera.position.z = 2
+                        loadNextFile();
+
 
 			var animate = function () {
 				renderer.render( scene, camera );

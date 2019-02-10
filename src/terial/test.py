@@ -15,13 +15,13 @@ from terial.models import Shape, ExemplarShapePair
 from skimage.io import imread
 from terial import config
 
-def feature(img_path):
-	image = imread(img_path)
+def feature():
+	image = imread("chair1.png")
 	image = image[:, :, :3]
 	feature = alignment.compute_features(image, bin_size=config.ALIGN_BIN_SIZE, im_shape=config.ALIGN_IM_SHAPE)
 	return feature
 
-def compute_pair(img_path, batch_size=20, num_workers=4, topk=5, prefetch=True):
+def main(batch_size, num_workers, topk, prefetch):
     with session_scope() as sess:
         tqdm.write('Fetching shapes.')
         shapes = (sess.query(Shape)
@@ -33,18 +33,15 @@ def compute_pair(img_path, batch_size=20, num_workers=4, topk=5, prefetch=True):
                     # if shape.data_exists(config.SHAPE_ALIGN_DATA_NAME)]
     # valid_exemplars = [exemplar for exemplar in exemplars
     #                    if exemplar.data_exists(config.EXEMPLAR_ALIGN_DATA_NAME)]
+    print('valid_shapes')
+    for shape in shapes[:10]:
+        print(shape.obj_path)
     dataset = AlignFeatureDataset(shapes, prefetch=prefetch)
     shape_loader = DataLoader(
         dataset=dataset, sampler=SequentialSampler(dataset),
         shuffle=False, batch_size=batch_size, num_workers=num_workers)
 
-    
-    exemplar_feat = feature(img_path)
-    exemplar_feat = (torch.from_numpy(exemplar_feat)
-                    # Dimensions: (shape, viewpoint, feat_dims).
-                    .view(1, 1, -1)
-                    .float()
-                    .cuda())
+
 
     # Iterate over shapes in outer loop since loading them is considerably more
     # expensive.
@@ -59,9 +56,9 @@ def compute_pair(img_path, batch_size=20, num_workers=4, topk=5, prefetch=True):
         #         f'Exemplar {exemplar.id} already has pairs, skipping')
         #     continue
         # exemplar_pbar.set_description(f'Exemplar {exemplar.id}')
-        res = process_exemplar(exemplar_feat, sess, shape_loader, topk=topk)
+        process_exemplar(sess, shape_loader, topk=topk)
 
-    return res
+    print('finish processing exemplar')
 
 def normalize_feats(batch):
     feat_norms = batch.norm(2, dim=1).view(batch.size(0), 1).expand(
@@ -77,11 +74,16 @@ def compute_feat_dists(batch_feats, image_feats):
         *batch_feats.size())).pow(2).sum(dim=1)
 
 
-def process_exemplar(exemplar_feat, sess, shape_loader, topk, max_dist=40):
+def process_exemplar(sess, shape_loader, topk, max_dist=40):
     shape_pbar = tqdm(shape_loader)
 
     best_pairs = []
-
+    exemplar_feat = feature()
+    exemplar_feat = (torch.from_numpy(exemplar_feat)
+                    # Dimensions: (shape, viewpoint, feat_dims).
+                    .view(1, 1, -1)
+                    .float()
+                    .cuda())
     for batch_idx, batch in enumerate(shape_pbar):
         shape_ids, shape_feats, thetas, phis, fovs = batch
 
@@ -135,7 +137,10 @@ def process_exemplar(exemplar_feat, sess, shape_loader, topk, max_dist=40):
     #            f"Added {num_added} pairs "
     #            f"({len(best_pairs) - num_added} were duplicates)")
     print("printing result: ")
-    return best_pairs[:topk]
+    for pair in best_pairs[:topk]:
+        print('shape_id: ' + str(pair.shape_id))
+        print('phi: ' + str(pair.elevation))
+        print('theta: ' + str(pair.azimuth))
      
 
 class AlignFeatureDataset(Dataset):
@@ -147,7 +152,7 @@ class AlignFeatureDataset(Dataset):
 
         if prefetch:
             tqdm.write('Prefetching shape data')
-            path = Path('/data/photoshape/shape_data.pth')
+            path = Path('/local1/photoshape/shape_data.pth')
             if path.exists():
                 tqdm.write(f"Loading shape data from {path!s}")
                 self.data_list = torch.load(str(path))
@@ -166,7 +171,7 @@ class AlignFeatureDataset(Dataset):
     def _load_data(shape):
         data = np.load(
             shape.get_data_path(config.SHAPE_ALIGN_DATA_NAME))
-        '/data/photoshape/shape_data.pth'
+        '/local1/photoshape/shape_data.pth'
 
         # Support new format.
         if 'arr_0' in data:
@@ -200,3 +205,6 @@ class AlignFeatureDataset(Dataset):
     def __len__(self):
         return len(self.shapes)
 
+
+if __name__ == '__main__':
+    main(20, 4, 10, True)

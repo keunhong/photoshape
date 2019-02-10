@@ -1,7 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from .forms import UploadedImageForm
-from .forms import UploadedImageForm2
 from .models import Material, UploadedImage
 import os
 import sys
@@ -16,11 +15,8 @@ import PIL.ImageOps
 import json
 from django.views.decorators.csrf import csrf_exempt
 import json
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + '/../../../../thirdparty/rendkit/meshkit/')
-import wavefront
-import json
-from django.template.loader import render_to_string
 # Create your views here.
+
 
 @csrf_exempt
 def homepage(request):
@@ -39,41 +35,22 @@ def homepage(request):
 
 	return render(request, 'homepage.html')
 
-def homepage2(request):
-        if request.method == 'POST':
-                result = request.POST.get('result')
-                form_id = request.POST.get('form_id')
-                if result is not None and form_id is not None:
-                        try:
-                                img = UploadedImage.objects.get(pk=form_id)
-                                img.user_material = Material.objects.get(pk=result)
-                                img.save()
-                                return render(request, 'homepage2.html', {'content': 'Your result has been submitted!'})
-                        except UploadedImage.DoesNotExist:
-                                return render(request, 'homepage2.html', {'content': "Error: Object doesn't exist in dataset"})
-
-
-        return render(request, 'homepage2.html')
-
 @csrf_exempt
 def display_models(request):
-	print(request.POST)
-	print(request.FILES)
 	original = 'original/chair1.png'
-	#models = find_match_models(original)
-	#return render(request, 'models.html')	
-
+	models = find_match_models(original)
+	return render(request, 'models.html', {'models':models})	
+	
 @csrf_exempt
-def display_results2(request):
+def display_results(request):
 	if (request.method == 'POST'):
-		print(request.POST)
-		print(request.FILES)
-		form = UploadedImageForm2(request.POST, request.FILES)
+		form = UploadedImageForm(request.POST, request.FILES)
 		if form.is_valid():
 			form.save()   
 			original = form.instance.original.name
 			mask = form.instance.mask.name
 			context={'url':form.instance.original.url}
+			#models = find_match_models(original)
 			materials = infer_results(original, mask)
 			# create or get Material instance
 			for m_id, name in materials:
@@ -81,45 +58,12 @@ def display_results2(request):
 				form.instance.computed_materials.add(m)
 			context['materials'] = materials
 			context['form'] = form.instance.pk
+			#context['models'] = models
 			return HttpResponse(json.dumps(context))
 		else:
 			print(form.errors)
 			print(form.non_field_errors())
 			return HttpResponse(form.errors)
-
-@csrf_exempt
-def display_results(request):
-	print(request.POST)
-	print(request.FILES)
-
-	if request.is_ajax():
-		form = UploadedImageForm(request.POST, request.FILES)
-		if form.is_valid():
-			form.save()   
-			original = form.instance.original.name
-			s_id, phi, theta = find_match_models(original)
-
-			#context['form'] = form.instance.pk
-
-			mesh = wavefront.read_obj_file('/data/photoshape/blobs/shapes/'+ s_id +'/original.obj')
-			materials = []
-			for idx, material in enumerate(mesh.materials):
-				materials.append((material, (idx+1)*20))
-		
-			html = render_to_string('models.html', {'models': [(s_id, phi, theta, mesh.bounding_size())], 'materials': materials, 'url':form.instance.original.url, 'name':original})
-	
-		else:
-			print(form.errors)
-			print(form.non_field_errors())
-			html = render_to_string('models.html')
-	
-
-	#return render(request, 'models.html', {'models': [(3825, 1.33, 4.58, mesh.bounding_size())], 'materials': materials})
-	
-	
-		return HttpResponse(html)
-
-	return render(request, 'models.html')
 
 def infer_results(original, mask):
 	current_path = os.path.dirname(os.path.abspath(__file__))
@@ -179,8 +123,7 @@ def find_match_models(original):
 	current_path = os.path.dirname(os.path.abspath(__file__))
 	image_path = current_path + '/../images/'+ original
 	pairs = match_models.compute_pair(image_path)
-	for pair in pairs[:1]:
-		return str(pair.shape_id), pair.elevation, pair.azimuth
-		#models.append((str(pair.shape_id), pair.elevation, pair.azimuth))
-	return 
+	for pair in pairs:
+		models.append((str(pair.shape_id), pair.elevation, pair.azimuth))
+	return models
 

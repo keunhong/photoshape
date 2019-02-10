@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Photoshape</title>
+        <h1>Photoshape</h1>
+    </head>
+    <body>
+
+			<style>
+					//body { margin: 0; }
+					canvas { 500px; height: 500px }
+				</style>
+<div class="file-upload">
+<button class="file-upload-btn" type="button" onclick='back()'>Start again</button>
+</div>	
+<div id="originalImg"> </div>
+		<div id="models"></div>
+<div id="color"></div>
+<div id="3Dmodel"></div>
+</body>
+	</html>
+	
+	{% load staticfiles %}
+	
+	<link rel="stylesheet" type="text/css" href="{% static '/homepage.css' %}" />
+	<link rel="stylesheet" type="text/css" href="{% static '/croppie.css' %}" />
+	<script class="jsbin" src="https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+	<script src={% static '/croppie.js' %}></script>
+	<script src={% static '/homepage.js' %}></script>
+	<script src={% static '/three.js' %}></script>
+	<script src={% static  '/OBJLoader.js' %}></script>
+	<script>
+			var scene = new THREE.Scene();
+			var camera = new THREE.PerspectiveCamera( 50,  window.innerWidth / window.innerHeight, 0.1, 5000 );
+
+			var renderer = new THREE.WebGLRenderer({preserveDrawingBuffer:true});
+			renderer.setSize(  window.innerWidth, window.innerHeight );
+			document.getElementById("models").appendChild( renderer.domElement );
+			$(renderer.domElement).attr('id', 'grayscale');
+var renderer2 = new THREE.WebGLRenderer();
+renderer2.setSize(  window.innerWidth, window.innerHeight );
+document.getElementById("color").appendChild( renderer2.domElement );
+var camera2 = new THREE.PerspectiveCamera( 50,  window.innerWidth / window.innerHeight, 0.1, 5000 );
+
+			var model;
+                        var model2;
+			var index = 0;
+			var files = [];
+			var elevations = [];
+			var azimuths = [];
+			var materials = [];
+			var bounding = [];
+
+
+			var objLoader = new THREE.OBJLoader();
+			       function loadNextFile() {
+
+          if (index > files.length - 1) {
+              animate();
+              return;
+          }
+           objLoader.load(files[index], function(object) {
+            object.traverse(function(node){
+					if (node.material) {
+//console.log(node.material);
+						node.material.side = THREE.DoubleSide;
+					}
+			for (var i = 0; i < materials[index].length; i++) {
+                     if ("material" in node && node.material.name==materials[index][i][0]) {
+
+                         node.material =  materials[index][i][1];
+
+} 
+  }
+			})
+            model = object;
+            scene.add(object);
+            model.scale.x *= (1 / bounding[index]);
+            model.scale.y *= (1 / bounding[index]);
+            model.scale.z *= (1 / bounding[index]);	
+            model.rotation.y += azimuths[index]-0.5*Math.PI;
+            model.rotation.x += 0.5*Math.PI - elevations[index]+0.1;
+            index++;
+            loadNextFile();
+
+          },
+              function ( xhr ) {
+                console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+            },
+            function ( error ) {
+                console.log( 'An error happened' );
+            });
+
+        }
+
+
+                        {% for id, phi, theta, bounding in models %}
+                        console.log({{ id }})
+                        console.log({{ phi }})
+                        console.log({{ theta }})
+                        files.push('/static/blobs/shapes/'+{{ id }}+'/original.obj');
+                        elevations.push({{ phi }});
+                        azimuths.push({{ theta }});
+                        bounding.push({{ bounding }});
+
+var m = [];
+{% for material, i in materials%}
+m.push(['{{ material }}', new THREE.MeshBasicMaterial({ color: 'rgb({{ i }}, {{ i }}, {{ i }})' })] );
+{% endfor %}
+materials.push(m)
+			
+                        {% endfor %}            
+
+        loadNextFile();			
+        
+
+        camera.position.z = 2;
+
+        var animate = function () {
+
+            renderer.render( scene, camera );
+            renderer2.render(scene2, camera);
+        };
+//imgData=renderer.domElement.toDataURL();
+//console.log(imgData)
+var grayscaleImg;
+    var fd = new FormData();
+    text = "<h2>Your image:</h2><img id='original' src=" + '{{ url }}' + " alt='your image' />"
+ $('#originalImg').html(text)
+    var filename = '{{ name }}'
+console.log(filename)
+     document.getElementById('grayscale').toBlob(function(blob) {
+        grayscaleImage = blob;
+
+    fd.append('grayscale', grayscaleImage, 'grayscale-'+filename);
+    fd.append('csrfmiddlewaretoken', getCookie('csrftoken'));
+    $('#load').show();
+    var tet = $.ajax({
+        url: '/models/',
+        type: 'POST',
+        data: fd,
+        async: true,
+        contentType: false,
+        enctype: 'multipart/form-data',
+        processData: false,
+        success: function (response) {
+        $("html").html(response);  
+	$('#file-upload-content').hide();
+          //data = JSON.parse(response)
+          //$('#load').hide();
+          //result(data)
+        },
+        error: function (error) {
+          $('#load').hide();
+          $('#error').html(error);
+          $('#error').show();
+        }
+    }).responseText;
+
+      }, 'image/png', 1);
+
+		</script>
+
+

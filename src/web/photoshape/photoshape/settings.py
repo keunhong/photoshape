@@ -25,7 +25,7 @@ SECRET_KEY = 'r_zl*(b(!+(b_e5z7o4jeff!r8g8q63-elwqeuw(6nynrqjyg7'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1']
+ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1', 'cremosa.cs.washington.edu']
 
 
 # Application definition
@@ -122,6 +122,7 @@ STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
+    '/data/photoshape/',
 ]
 
 # User uploaded image files
