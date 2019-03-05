@@ -42,6 +42,7 @@ async def list_exemplars(request: web.Request):
         'page_size': page_size,
         'n_total': count,
         'n_pages': n_pages,
+        'query': query,
     }
 
 

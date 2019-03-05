@@ -346,11 +346,14 @@ def compute_pair_inference(inference_dir, mat_by_id, pair):
     rend_minc_inferred_path = (inference_dir.parent / '45-minc-subst'
                                / 'renderings-cropped'
                                / f'{pair.id}.inferred.0000.jpg')
-    rend_inferred_path = (inference_dir / 'renderings-calibrated-cropped'
+    rend_inferred_path = (inference_dir / 'renderings-cropped'
                           / f'{pair.id}.inferred.0000.jpg')
-    if not rend_inferred_path.exists():
-        rend_inferred_path = (inference_dir / 'renderings-aligned-cropped'
-                              / f'{pair.id}.inferred.0000.jpg')
+    # if not rend_inferred_path.exists():
+    #     rend_inferred_path = (inference_dir / 'renderings-aligned-cropped'
+    #                           / f'{pair.id}.inferred.0000.jpg')
+    # if not rend_inferred_path.exists():
+    #     rend_inferred_path = (inference_dir / 'renderings-cropped'
+    #                           / f'{pair.id}.inferred.0000.jpg')
     rend_inferred_frontal_path = (inference_dir / 'renderings-frontal'
                           / f'{pair.id}.inferred.0000.jpg')
     rend_mtl_path = (config.BRDF_CLASSIFIER_DIR_REMOTE

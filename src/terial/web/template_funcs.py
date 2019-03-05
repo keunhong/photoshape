@@ -2,15 +2,15 @@ from terial import config
 
 
 def nginx_url(path):
-    path = str(path).replace('/local1/kpar', '')
+    path = str(path).replace('/local1/data/terial', 'terial-static')
     path = str(path).replace('/projects/grail/kparnb/data/terial',
-                             '/static-terial')
+                             'terial-static')
     return config.WEB_ROOT + path
 
 
 def _static_url(resource):
     resource = resource.lstrip('/')
-    return f'{config.WEB_ROOT}/{resource}'
+    return f'{config.WEB_ROOT}terial-static/{resource}'
 
 
 def get_pages(cur_page, n_total_pages, n_display=10):

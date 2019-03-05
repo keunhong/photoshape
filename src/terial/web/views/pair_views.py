@@ -20,6 +20,7 @@ async def _list_pairs(request):
     sort_field = request.query.get('sort_field', 'distance')
     sort_order = request.query.get('sort_order', 'asc')
     category = request.query.get('category', None)
+    shape_id = request.query.get('shape_id', None)
     sort_field = {
         'pair_id': ExemplarShapePair.id,
         'exemplar_id': ExemplarShapePair.exemplar_id,
@@ -50,6 +51,8 @@ async def _list_pairs(request):
         filters.append(ExemplarShapePair.shape.has(source=source))
     if category is not None:
         filters.append(ExemplarShapePair.shape.has(category=category))
+    if shape_id is not None:
+        filters.append(ExemplarShapePair.shape.has(id=shape_id))
 
     consistent_segments = \
         request.query.get('consistent_segments', 'false') == 'true'
