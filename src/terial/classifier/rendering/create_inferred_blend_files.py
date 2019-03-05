@@ -56,6 +56,7 @@ def worker(pair_id, renderings_dir):
             str(out_path),
             '--type', scene_type,
             # '--use-weighted-scores',
+            '--pack-assets',
         ]
         if args.frontal:
             command.append('--frontal')
