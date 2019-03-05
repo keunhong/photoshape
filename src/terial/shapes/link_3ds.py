@@ -2,6 +2,7 @@
 Registers shapes in the 3DS Max format given a directory.
 """
 import argparse
+import time
 from pathlib import Path
 
 import bpy
@@ -25,6 +26,8 @@ args = parser.parse_args()
 
 
 def register_shape(app, shape, path):
+    shape_dir = Path(config.BLOB_ROOT, 'shapes', str(shape.id))
+
     with suppress_stdout():
         scene = brender.Scene(app, shape=(1000, 1000))
         mesh = brender.Mesh.from_3ds(scene, path)
@@ -32,8 +35,6 @@ def register_shape(app, shape, path):
         mesh.make_normals_consistent()
         mesh.enable_smooth_shading()
         mesh.unwrap_uv()
-
-    shape_dir = Path(config.BLOB_ROOT, 'shapes', str(shape.id))
 
     bpy.ops.export_scene.obj(filepath=str(TMP_OBJ_PATH))
 
@@ -54,29 +55,27 @@ def main():
     for ext in ('*.3ds', '*.3DS'):
         paths.extend(args.models_dir.glob(ext))
 
-    for path in paths:
-        with session_scope() as sess:
-            shapes = sess.query(models.Shape).filter_by(source_id=path.name).all()
-        print([s for s in shapes])
-
     app = brender.Brender()
 
     pbar = tqdm(paths)
-    for path in pbar:
-        pbar.set_description(f'{path}')
+    with session_scope() as sess:
+        for path in pbar:
+            pbar.set_description(f'{path}')
 
-        with session_scope() as sess:
-            shapes = sess.query(models.Shape).filter_by(source_id=path.name).all()
+            shapes = (sess.query(models.Shape)
+                      .filter_by(source_id=path.name)
+                      .order_by(models.Shape.id)
+                      .all())
 
-        if len(shapes) == 0:
-            continue
+            if len(shapes) == 0:
+                continue
 
-        for shape in shapes:
-            app.init()
-            try:
-                register_shape(app, shape, path)
-            except Exception:
-                raise
+            for shape in shapes:
+                app.init()
+                try:
+                    register_shape(app, shape, path)
+                except Exception:
+                    raise
 
 
 if __name__ == '__main__':

@@ -3,7 +3,6 @@ Register ShapeNet shapes to our database given the CSV downloaded from the
 ShapeNet Portal.
 """
 import argparse
-import json
 import logging
 import re
 from pathlib import Path
@@ -11,11 +10,9 @@ import bpy
 
 import shutil
 
-import csv
 import visdom
 from tqdm import tqdm
 
-from terial.database import session_scope
 from terial.models import Shape
 from terial import config, database
 from terial.shapes import shapenet
@@ -132,6 +129,7 @@ def register_shape(shape, sn_model):
         uvmapped_mtl_path.unlink()
         shape_dir.rmdir()
         raise
+
 
 def find_shape_dir(row, parent_dict):
     shape_id = row['fullId'].split('.')[-1]
