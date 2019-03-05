@@ -41,8 +41,8 @@ pyenv update
 sudo apt-get install -y make build-essential libssl-dev zlib1g-dev libbz2-dev \
 libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev \
 xz-utils tk-dev libffi-dev liblzma-dev
-pyenv install 3.7.0
-pyenv virtualenv 3.7.0 photoshape
+pyenv install 3.7.1
+pyenv virtualenv 3.7.1 photoshape
 
 # Enter the environment and set paths
 source env.sh
@@ -50,6 +50,12 @@ source env.sh
 
 ### Install Dependencies
 
+### Non-Python Dependencies
+ * Blender 2.79 or higher
+ * Docker and Docker-Compose
+ * NVIDIA GPU compatible with PyTorch and OpenGL rendering.
+
+#### Python Dependencies
 If you just need to use the network, all you'll need is the basic dependencies.
 
 ```bash
