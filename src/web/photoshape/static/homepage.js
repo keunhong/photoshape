@@ -7,8 +7,8 @@ var outlineImage = new Image();
 var croppedImage;
 $uploadCrop = $('#upload-image').croppie({
         viewport: {
-            width: 400,
-            height: 400,
+            width: 500,
+            height: 500,
         },
     });
 
@@ -174,7 +174,7 @@ function saveImg() {
     // console.log(document.getElementById("file").value);
   $uploadCrop.croppie('result', {
               type: 'blob',
-              size: {width: 224, height: 224}
+              size: {width: 500, height: 500}
           }).then(function (blob) {
             croppedImage = blob;
     });
@@ -341,8 +341,8 @@ function init (url) {
     canvas = $('#canvas');
     // canvas = document.getElementById('canvas').getContext("2d")
     canvas.attr({
-        width: 404,
-        height: 404,
+        width: 504,
+        height: 504,
     });
     ctx = canvas[0].getContext('2d');
     strokes = [];

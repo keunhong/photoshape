@@ -7,17 +7,23 @@
     <body>
 
 			<style>
-					//body { margin: 0; }
 					canvas { 500px; height: 500px }
 				</style>
 <div class="file-upload">
 <button class="file-upload-btn" type="button" onclick='back()'>Start again</button>
 </div>	
-<div id="originalImg"> </div>
-		<div id="models"></div>
-<div id="color"></div>
-<div id="3Dmodel"></div>
+<div id="images" style="text-align: center">
+  <div id="originalImg"> </div>
+  <div id="models" style="display:none"></div>
+  <div id="color"><h2>Your 2D model:</h2></div>
+  <div id="3Dmodel"><h2>Your 3D model:</h2></div>
+  <div id="error"><div>
+</div>
+<div class="container" style="text-align:center">
+        <p class="legal-info-text">Copyright <span class="font-family-base-sans-serif">©<strong></strong></span><strong> 2019 Yifan Xu. All rights reserved.</strong> <span class="font-family-base-sans-serif">®</span></p>
+    </div>
 </body>
+
 	</html>
 	
 	{% load staticfiles %}
@@ -30,20 +36,29 @@
 	<script src={% static '/three.js' %}></script>
 	<script src={% static  '/OBJLoader.js' %}></script>
 	<script>
+			var camera = new THREE.PerspectiveCamera( 50,  1, 0.1, 5000 );
 			var scene = new THREE.Scene();
-			var camera = new THREE.PerspectiveCamera( 50,  window.innerWidth / window.innerHeight, 0.1, 5000 );
+var scene2 = new THREE.Scene();
+var scene3 = new THREE.Scene();
 
 			var renderer = new THREE.WebGLRenderer({preserveDrawingBuffer:true});
-			renderer.setSize(  window.innerWidth, window.innerHeight );
+			renderer.setSize( 1000, 1000 );
 			document.getElementById("models").appendChild( renderer.domElement );
 			$(renderer.domElement).attr('id', 'grayscale');
 var renderer2 = new THREE.WebGLRenderer();
-renderer2.setSize(  window.innerWidth, window.innerHeight );
+renderer2.setSize(  1000, 1000 );
 document.getElementById("color").appendChild( renderer2.domElement );
-var camera2 = new THREE.PerspectiveCamera( 50,  window.innerWidth / window.innerHeight, 0.1, 5000 );
+var renderer3 = new THREE.WebGLRenderer();
+renderer3.setSize(  1000, 1000 );
+document.getElementById("3Dmodel").appendChild( renderer3.domElement );
+			
+var ambient = new THREE.AmbientLight( 0x333333 );
+			scene3.add( ambient );
+			var directionalLight = new THREE.DirectionalLight( 0xffeedd );
+			directionalLight.position.set( 0, 0, 1 ).normalize();
+			scene3.add( directionalLight );
 
 			var model;
-                        var model2;
 			var index = 0;
 			var files = [];
 			var elevations = [];
@@ -61,18 +76,17 @@ var camera2 = new THREE.PerspectiveCamera( 50,  window.innerWidth / window.inner
           }
            objLoader.load(files[index], function(object) {
             object.traverse(function(node){
-					if (node.material) {
-//console.log(node.material);
-						node.material.side = THREE.DoubleSide;
-					}
+                                        if (node.material ) {
+node.material = new THREE.MeshBasicMaterial({ name: node.material.name, color: 'rgb(0, 0, 0)', side: THREE.DoubleSide })
+
+                                        }
+
 			for (var i = 0; i < materials[index].length; i++) {
                      if ("material" in node && node.material.name==materials[index][i][0]) {
 
                          node.material =  materials[index][i][1];
-
-} 
-  }
-			})
+}
+			}})
             model = object;
             scene.add(object);
             model.scale.x *= (1 / bounding[index]);
@@ -99,67 +113,139 @@ var camera2 = new THREE.PerspectiveCamera( 50,  window.innerWidth / window.inner
                         console.log({{ id }})
                         console.log({{ phi }})
                         console.log({{ theta }})
-                        files.push('/static/blobs/shapes/'+{{ id }}+'/original.obj');
+                        files.push('/static/blobs/shapes/'+{{ id }}+'/models/uvmapped_v2.obj');
                         elevations.push({{ phi }});
                         azimuths.push({{ theta }});
                         bounding.push({{ bounding }});
 
 var m = [];
-{% for material, i in materials%}
-m.push(['{{ material }}', new THREE.MeshBasicMaterial({ color: 'rgb({{ i }}, {{ i }}, {{ i }})' })] );
+var m2 = [];
+{% for material, i in g_materials%}
+m.push(['{{ material }}', new THREE.MeshBasicMaterial({ color: 'rgb({{ i }}, {{ i }}, {{ i }})', side: THREE.DoubleSide })] );
+{% endfor %}
+{% for material, c in c_materials%}
+m2.push(['{{ material }}', new THREE.MeshBasicMaterial({ color: '{{ c }}', side: THREE.DoubleSide })] );
 {% endfor %}
 materials.push(m)
 			
                         {% endfor %}            
 
         loadNextFile();			
-        
 
+ var objLoader2 = new THREE.OBJLoader();
+                               function loadNextFile2() {
+
+           objLoader2.load(files[0], function(object) {
+            object.traverse(function(node){
+                                        if (node.material ) {
+node.material = new THREE.MeshBasicMaterial({ name: node.material.name, color: 'rgb(0, 0, 0)', side: THREE.DoubleSide })
+
+                                        }
+                        for (var i = 0; i < m2.length; i++) {
+                     if ("material" in node && node.material.name==m2[i][0]) {
+                         node.material =  m2[i][1];
+
+}   
+                        }})
+            model = object;
+            scene2.add(object);
+            model.scale.x *= (1 / bounding[0]);
+            model.scale.y *= (1 / bounding[0]);
+            model.scale.z *= (1 / bounding[0]);     
+            model.rotation.y += azimuths[0]-0.5*Math.PI;
+            model.rotation.x += 0.5*Math.PI - elevations[0]+0.1;
+            animate2();
+          },
+              function ( xhr ) {
+                console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+            },
+            function ( error ) {
+                console.log( 'An error happened' );
+            });
+
+        }
+
+ loadNextFile2();
+
+
+
+var objLoader3 = new THREE.OBJLoader();
+                               function loadNextFile3() {
+
+           objLoader3.load(files[0], function(object) {
+            object.traverse(function(node){
+                                        if ("material" in node) {
+                                                node.material.side = THREE.DoubleSide;
+                                        }
+
+
+                        })
+            model = object;
+            scene3.add(object);
+            model.scale.x *= (1 / bounding[0]);
+            model.scale.y *= (1 / bounding[0]);
+            model.scale.z *= (1 / bounding[0]);     
+            model.rotation.y += azimuths[0]-0.5*Math.PI;
+            model.rotation.x += 0.5*Math.PI - elevations[0]+0.1;
+renderer3.render(scene3, camera);          
+},
+              function ( xhr ) {
+                console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+            },
+            function ( error ) {
+                console.log( 'An error happened' );
+            });
+
+        }
+
+loadNextFile3();
         camera.position.z = 2;
 
         var animate = function () {
 
             renderer.render( scene, camera );
-            renderer2.render(scene2, camera);
+	    submit_g();
         };
-//imgData=renderer.domElement.toDataURL();
-//console.log(imgData)
-var grayscaleImg;
+
+        var animate2 = function () {
+
+            renderer2.render(scene2, camera);
+
+        };
+
+
+var submit_g = function() {
+    var grayscaleImg;
     var fd = new FormData();
     text = "<h2>Your image:</h2><img id='original' src=" + '{{ url }}' + " alt='your image' />"
- $('#originalImg').html(text)
+    $('#originalImg').html(text)
     var filename = '{{ name }}'
-console.log(filename)
-     document.getElementById('grayscale').toBlob(function(blob) {
+    document.getElementById('grayscale').toBlob(function(blob) {
         grayscaleImage = blob;
 
-    fd.append('grayscale', grayscaleImage, 'grayscale-'+filename);
-    fd.append('csrfmiddlewaretoken', getCookie('csrftoken'));
-    $('#load').show();
-    var tet = $.ajax({
-        url: '/models/',
-        type: 'POST',
-        data: fd,
-        async: true,
-        contentType: false,
-        enctype: 'multipart/form-data',
-        processData: false,
-        success: function (response) {
-        $("html").html(response);  
-	$('#file-upload-content').hide();
-          //data = JSON.parse(response)
-          //$('#load').hide();
-          //result(data)
-        },
-        error: function (error) {
-          $('#load').hide();
-          $('#error').html(error);
-          $('#error').show();
-        }
-    }).responseText;
+        fd.append('grayscale', grayscaleImage, 'grayscale-'+filename);
+        fd.append('csrfmiddlewaretoken', getCookie('csrftoken'));
+	fd.append('url', '{{ url }}');
+        var tet = $.ajax({
+            url: '/models/',
+            type: 'POST',
+            data: fd,
+            async: true,
+            contentType: false,
+            enctype: 'multipart/form-data',
+            processData: false,
+            success: function (response) {
+            },
+            error: function (error) {
+                $('#error').html(error);
+                $('#error').show();
+            }
+        }).responseText;
 
-      }, 'image/png', 1);
-
+    }, 'image/png', 1);
+}
 		</script>
 
 
