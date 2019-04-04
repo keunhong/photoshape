@@ -17,7 +17,9 @@
   <div id="models" style="display:none"></div>
   <div id="color"><h2>Your 2D model:</h2></div>
   <div id="3Dmodel"><h2>Your 3D model:</h2></div>
+  <h2 id="load" style="display:none">Loading...</h2>
   <div id="error"><div>
+  <div id="infer_results"><h2>Materials:</h2></div>
 </div>
 <div class="container" style="text-align:center">
         <p class="legal-info-text">Copyright <span class="font-family-base-sans-serif">©<strong></strong></span><strong> 2019 Yifan Xu. All rights reserved.</strong> <span class="font-family-base-sans-serif">®</span></p>
@@ -237,10 +239,14 @@ var submit_g = function() {
             enctype: 'multipart/form-data',
             processData: false,
             success: function (response) {
+              data = JSON.parse(response)
+              $('#load').hide();
+              result(data);
             },
             error: function (error) {
-                $('#error').html(error);
-                $('#error').show();
+              $('#load').hide();
+	      $('#error').html(error);
+              $('#error').show();
             }
         }).responseText;
 

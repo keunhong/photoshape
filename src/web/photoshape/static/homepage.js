@@ -41,7 +41,40 @@ $uploadCrop = $('#upload-image').croppie({
         }
     });
 
+
 function result(data){
+  
+  var results = document.getElementById("infer_results");
+
+  for (var idx in data) {
+      ids = data[idx]
+      var part = document.createElement("div")
+      part.className = "part"
+      part.id = "part"+idx
+      var title = document.createElement("h3")
+      title.textContent = idx
+      part.appendChild(title);
+      for (var i = 0; i < ids.length; i++) {
+	  id = ids[i][0]
+	  name = ids[i][1]
+	  var res_container = document.createElement("div")
+	  res_container.className = "res_container"
+	  var res_label = document.createElement("label")
+	  res_label.htmlFor = id
+	  res_label.innerHTML = name
+	  var res_img = document.createElement("img")
+	  res_img.className = "res_img"
+	  res_img.src = "/images/materials/" + id +"/images/previews/bmps.png"
+	  res_img.id = id
+	  res_container.appendChild(res_label);
+	  res_container.appendChild(res_img);
+	  part.appendChild(res_container);
+      }
+      results.appendChild(part);
+  }
+}
+
+function old_result(data){
   ids = data['materials']
   url = data['url']
   fid = data['form']

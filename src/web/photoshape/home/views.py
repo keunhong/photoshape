@@ -197,7 +197,7 @@ def display_models(request):
         myfile = request.FILES['grayscale'] # absolute path 
         filename = myfile.name
         im = imread(myfile)[:, :, 0]
-        im2 = imread('/homes/grail/xuyf/WindowsFolders/git/photoshape/src/web/photoshape'+request.POST['url'])
+        im2 = imread('/projects/grail/photoshapenb/xuyf/photoshape/src/web/photoshape'+request.POST['url'])
         im2 = im2[:, :, :3]
         #im2 = imread('original/chair1_1a9E6Qd.png')
         fg_mask = im > 0
@@ -207,7 +207,7 @@ def display_models(request):
         if len(res) > 0 and res[-1] != 'png':
             filename = ''.join(res[:-1])
             filename += '.png'
-        imsave('/homes/grail/xuyf/WindowsFolders/git/photoshape/src/web/photoshape/images/grayscale/'+filename, final_im)
+        imsave('/projects/grail/photoshapenb/xuyf/photoshape/src/web/photoshape/images/grayscale/'+filename, final_im)
         with NamedTemporaryFile(suffix='.png') as exemplar_f, \
         NamedTemporaryFile(suffix='.png') as shape_f:
             base_pattern = np.dstack((np.zeros(config.SHAPE_REND_SHAPE), *np.meshgrid(np.linspace(0, 1, config.SHAPE_REND_SHAPE[0]),np.linspace(0, 1, config.SHAPE_REND_SHAPE[1]))))
@@ -259,8 +259,19 @@ opts={'title': 'sil-flow-applied'})
         crf_seg_vis = visualize_segment_map(crf_seg_map)
 
         vis.image(crf_seg_vis.transpose((2, 0, 1)), win='crf_seg_vis')
+        imsave('/projects/grail/photoshapenb/xuyf/photoshape/src/web/photoshape/images/grayscale/'+filename, crf_seg_map)
+        indices = np.unique(crf_seg_map)[1:]
+        for idx in indices:
+            #new_img = np.zeros(crf_seg_map.shape)
+            new_img = (crf_seg_map == idx)*225
+            imsave('/projects/grail/photoshapenb/xuyf/photoshape/src/web/photoshape/images/mask/'+str(idx)+'-'+filename, new_img)
+            original_path = request.POST['url']
+            print(original_path)
+            mask_path = '/images/mask/'+str(idx)+'-'+filename
+            materials = infer_results(original_path, mask_path)
+            context[str(idx)] = materials
+        return HttpResponse(json.dumps(context))
 
-        return HttpResponse("success")
     return HttpResponse("fail")
 
 @csrf_exempt
@@ -320,7 +331,29 @@ def display_results(request):
 
     return render(request, 'models.html')
 
-def infer_results(original, mask):
+def infer_results():
+    current_path = os.path.dirname(os.path.abspath(__file__))
+    image_path = Path(current_path + '/..'+ original)
+    mask_path = Path(current_path + '/..'+ mask)
+    print(image_path)
+    print(mask_path)
+    checkpoint_path= Path(current_path + '/../../../../data/classifier/model/model_best.pth.tar')
+
+    result = infer_one_web.start_infer(image_path, mask_path, checkpoint_path)
+
+    with open(current_path + '/../../../../data/json/materials.json') as f:
+        data = json.load(f)
+
+    materials = []
+    for material in result['material'][:5]:
+        m_id = material['id']
+        # m_substance = material['pred_substance']
+        # m_url = '/images/materials/' + str(m_id) + '/images/previews/bmps.png'
+        m_name = data[str(m_id)]['name']
+        materials.append((m_id, m_name))
+    return materials
+
+def old_infer_results(original, mask):
     current_path = os.path.dirname(os.path.abspath(__file__))
     image_path = Path(current_path + '/../images/'+ original)
     mask_path = Path(current_path + '/../images/'+ mask)
