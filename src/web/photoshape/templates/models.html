@@ -10,7 +10,8 @@
 					canvas { 500px; height: 500px }
 				</style>
 <div class="file-upload">
-<button class="file-upload-btn" type="button" onclick='back()'>Start again</button>
+<button id="again" style="display:none" class="file-upload-btn" type="button" onclick='back()'>Start again</button>
+<button id="get_materials" class="file-upload-btn" type="button" style="display:none" onclick='submit_g()'>Get materials</button>
 </div>	
 <div id="images" style="text-align: center">
   <div id="originalImg"> </div>
@@ -19,7 +20,8 @@
   <div id="3Dmodel"><h2>Your 3D model:</h2></div>
   <h2 id="load" style="display:none">Loading...</h2>
   <div id="error"><div>
-  <div id="infer_results"><h2>Materials:</h2></div>
+  <div id="crf"></div>
+  <div style="display:none" id="infer_results"><h2>Materials:</h2></div>
 </div>
 <div class="container" style="text-align:center">
         <p class="legal-info-text">Copyright <span class="font-family-base-sans-serif">©<strong></strong></span><strong> 2019 Yifan Xu. All rights reserved.</strong> <span class="font-family-base-sans-serif">®</span></p>
@@ -208,7 +210,7 @@ loadNextFile3();
         var animate = function () {
 
             renderer.render( scene, camera );
-	    submit_g();
+            $('#get_materials').show();
         };
 
         var animate2 = function () {
@@ -221,7 +223,11 @@ loadNextFile3();
 var submit_g = function() {
     var grayscaleImg;
     var fd = new FormData();
-    text = "<h2>Your image:</h2><img id='original' src=" + '{{ url }}' + " alt='your image' />"
+    $('#load').show();
+    $('#color').hide();
+    $('#3Dmodel').hide();
+$('#get_materials').hide();
+    var text = "<h2>Your image:</h2><img id='original' src=" + '{{ url }}' + " alt='your image' />"
     $('#originalImg').html(text)
     var filename = '{{ name }}'
     document.getElementById('grayscale').toBlob(function(blob) {
@@ -241,6 +247,10 @@ var submit_g = function() {
             success: function (response) {
               data = JSON.parse(response)
               $('#load').hide();
+              $('#infer_results').show();
+              $('#again').show();
+              var text = "<h2>Your model:</h2><img id='crf' src='/images/crf/"+ data['filename'] + "' alt='your image' />"
+    $('#crf').html(text)
               result(data);
             },
             error: function (error) {

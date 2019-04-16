@@ -5,9 +5,9 @@ from pathlib import Path
 Database Configuration
 """
 DB_NAME = 'photoshape_db'
-DB_HOST = 'localhost'
+DB_HOST = 'drell.cs.washington.edu' 
 DB_USER = 'photoshape_user'
-DB_PASS = 'photoshape_password'
+DB_PASS = 'GcW7pbMaxxb2n6BwjvpPrTTw8vdZkWMUNPd7io'
 DB_PORT = 15432
 DB_DSN = f'postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
 
@@ -21,7 +21,7 @@ WEB_ROOT = 'http://localhost/static'
 """
 Directory configuration
 """
-LOCAL_ROOT = Path('/home/kpar/projects/photoshape/data')
+LOCAL_ROOT = Path('/data/photoshape')
 REMOTE_ROOT = Path('/projects/grail/kparnb/data')
 
 # The directory where blob data associated with DB rows will be stored.

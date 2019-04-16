@@ -199,7 +199,6 @@ def display_models(request):
         im = imread(myfile)[:, :, 0]
         im2 = imread('/projects/grail/photoshapenb/xuyf/photoshape/src/web/photoshape'+request.POST['url'])
         im2 = im2[:, :, :3]
-        #im2 = imread('original/chair1_1a9E6Qd.png')
         fg_mask = im > 0
         fg_bbox = mask_bbox(fg_mask)
         final_im = crop_tight_fg(im, config.SHAPE_REND_SHAPE ,bbox=fg_bbox, fill=0, order=0)
@@ -260,7 +259,9 @@ opts={'title': 'sil-flow-applied'})
 
         vis.image(crf_seg_vis.transpose((2, 0, 1)), win='crf_seg_vis')
         imsave('/projects/grail/photoshapenb/xuyf/photoshape/src/web/photoshape/images/grayscale/'+filename, crf_seg_map)
+        imsave('/projects/grail/photoshapenb/xuyf/photoshape/src/web/photoshape/images/crf/'+filename, crf_seg_vis)
         indices = np.unique(crf_seg_map)[1:]
+        context = {'filename' : filename}
         for idx in indices:
             #new_img = np.zeros(crf_seg_map.shape)
             new_img = (crf_seg_map == idx)*225
@@ -269,7 +270,9 @@ opts={'title': 'sil-flow-applied'})
             print(original_path)
             mask_path = '/images/mask/'+str(idx)+'-'+filename
             materials = infer_results(original_path, mask_path)
-            context[str(idx)] = materials
+            r, g, b = QUAL_COLORS[idx]
+            color = 'rgb('+str(r)+','+str(g)+','+str(b)+')'
+            context[color] = materials
         return HttpResponse(json.dumps(context))
 
     return HttpResponse("fail")
@@ -331,14 +334,11 @@ def display_results(request):
 
     return render(request, 'models.html')
 
-def infer_results():
+def infer_results(original, mask):
     current_path = os.path.dirname(os.path.abspath(__file__))
     image_path = Path(current_path + '/..'+ original)
     mask_path = Path(current_path + '/..'+ mask)
-    print(image_path)
-    print(mask_path)
     checkpoint_path= Path(current_path + '/../../../../data/classifier/model/model_best.pth.tar')
-
     result = infer_one_web.start_infer(image_path, mask_path, checkpoint_path)
 
     with open(current_path + '/../../../../data/json/materials.json') as f:
@@ -347,8 +347,6 @@ def infer_results():
     materials = []
     for material in result['material'][:5]:
         m_id = material['id']
-        # m_substance = material['pred_substance']
-        # m_url = '/images/materials/' + str(m_id) + '/images/previews/bmps.png'
         m_name = data[str(m_id)]['name']
         materials.append((m_id, m_name))
     return materials

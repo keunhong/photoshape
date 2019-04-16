@@ -25,7 +25,7 @@ SECRET_KEY = 'r_zl*(b(!+(b_e5z7o4jeff!r8g8q63-elwqeuw(6nynrqjyg7'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1', 'cremosa.cs.washington.edu']
+ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1', 'cremosa.cs.washington.edu','brew.cs.washington.edu','verona.cs.washington.edu']
 
 
 # Application definition

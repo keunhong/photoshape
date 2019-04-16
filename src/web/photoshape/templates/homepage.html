@@ -1,6 +1,14 @@
 {% extends "base.html" %}
 {% block content %}
 
+
+<div class="progress">
+  <div class="progress-bar progress-bar-striped progress-bar-animated" id="step1" role="progressbar" style="width: 0%" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100"></div>
+  <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" id="step2" role="progressbar" style="width: 0%" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100"></div>
+  <div class="progress-bar progress-bar-striped progress-bar-animated bg-info" id="step3" role="progressbar" style="width: 0%" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
+</div>
+
+
 <div class="file-upload">
 
       <button class="file-upload-btn" type="button" onclick="$('.file-upload-input').trigger( 'click' )">Add Image</button>
@@ -11,8 +19,8 @@
     <input class="file-upload-input" type='file' onchange="readURL(this);" accept="image/*" />
 
   </div>
-        <button id="crop-btn" style="display:none" class="file-upload-btn" type="button" onclick="showCropped();">Crop</button>
-        <div id="canvasDiv"></div>
+<div id="croppedImage" style="padding-bottom:80px">        
+<div id="canvasDiv"></div>
   <div id="file-upload-content">
     <img id="upload-image" src="#" alt="your image" />
     <div id="image-title-wrap">
@@ -21,10 +29,9 @@
   <div id="cropped">
 
   </div>
-<div id="controls" style="display:none">     
-<button id="infer" class="file-upload-btn" type="button" onclick="infer();">Infer</button> 
 </div>
 
+<button id="crop-btn" style="display:none" class="file-upload-btn" type="button" onclick="showCropped();">Go</button>
 </div>
 <h2 id="load" style="display:none">Loading...(it might take around 20s)</h2>
 <h2 id="error" style="display:none"></h2>
