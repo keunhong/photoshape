@@ -206,14 +206,14 @@ def display_models(request):
         if len(res) > 0 and res[-1] != 'png':
             filename = ''.join(res[:-1])
             filename += '.png'
-        imsave('/projects/grail/photoshapenb/xuyf/photoshape/src/web/photoshape/images/grayscale/'+filename, final_im)
+        imsave('/projects/grail/photoshapenb/xuyf/photoshape/src/web/photoshape/images/grayscale/'+filename, final_im, check_contrastbool=False)
         with NamedTemporaryFile(suffix='.png') as exemplar_f, \
         NamedTemporaryFile(suffix='.png') as shape_f:
             base_pattern = np.dstack((np.zeros(config.SHAPE_REND_SHAPE), *np.meshgrid(np.linspace(0, 1, config.SHAPE_REND_SHAPE[0]),np.linspace(0, 1, config.SHAPE_REND_SHAPE[1]))))
 
             exemplar_sil = bright_pixel_mask(im2, percentile=80)
             exemplar_sil = binary_closing(exemplar_sil, selem=disk(3))
-            exemplar_sil = transform.resize(exemplar_sil, (500, 500),anti_aliasing=True, mode='reflect')
+            exemplar_sil = transform.resize(exemplar_sil, config.SHAPE_REND_SHAPE,anti_aliasing=True, mode='reflect')
             #shape_sil = pair.load_data(config.SHAPE_REND_SEGMENT_MAP_NAME) - 1
             shape_sil = (final_im > 0)
             shape_sil = binary_closing(shape_sil, selem=disk(3))
@@ -311,10 +311,34 @@ def display_results(request):
         if form.is_valid():
             form.save()   
             original = form.instance.original.name
+            
+            current_path = os.path.dirname(os.path.abspath(__file__))
+            url = form.instance.original.url
+            print(url)
+            image_path = current_path + '/..'+ url
+
+            desired_size = config.SHAPE_REND_SHAPE[0]
+            im = Image.open(image_path)
+            old_size = im.size
+
+            ratio = float(desired_size)/max(old_size)
+            new_size = tuple([int(x*ratio) for x in old_size])
+
+            im = im.resize(new_size, Image.ANTIALIAS)
+
+            if im.mode == 'RGBA':
+                new_im = Image.new("RGBA", config.SHAPE_REND_SHAPE, 'white')
+            else:
+                new_im = Image.new("RGB", config.SHAPE_REND_SHAPE, 'white')
+            new_im.save('/projects/grail/photoshapenb/xuyf/photoshape/src/web/photoshape/images/original/test.png')
+            new_im.paste(im, ((desired_size-new_size[0])//2,
+                              (desired_size-new_size[1])//2),mask=im)
+
+            new_im.save('/projects/grail/photoshapenb/xuyf/photoshape/src/web/photoshape/images/'+original,'png')
+            
+
             s_id, phi, theta = find_match_models(original)
-
-            #context['form'] = form.instance.pk
-
+            
             mesh = wavefront.read_obj_file('/data/photoshape/blobs/shapes/'+ s_id +'/models/uvmapped_v2.obj')
             g_materials = []
             c_materials = []

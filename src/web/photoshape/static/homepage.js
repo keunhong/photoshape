@@ -249,7 +249,7 @@ function back() {
 function showCropped() {
   $uploadCrop.croppie('result', {
               type: 'blob',
-              size: {width: 500, height: 500}
+              size: {width: 500, height: 500},
           }).then(function (blob) {
             croppedImage = blob;
     });
@@ -257,6 +257,7 @@ function showCropped() {
   $uploadCrop.croppie('result', {
               type: 'rawcanvas',
               size: 'viewport',
+
           }).then(function (rawcanvas) {
     $('#file-upload-content').hide();
     $('#cropped').html(rawcanvas);
@@ -267,7 +268,6 @@ infer();
     
 }
 function infer() {
-    $('#step1').css('width','33.33%');
     var fd = new FormData();
     var filename = document.getElementById('image-title-wrap').innerHTML;
      document.getElementById('canvas').toBlob(function(blob) {
@@ -275,7 +275,7 @@ function infer() {
 
     fd.append('original', croppedImage, filename);
     fd.append('csrfmiddlewaretoken', getCookie('csrftoken'));
-var tet = $.ajax({
+	 var tet = $.ajax({
         url: '/results/',
         type: 'POST',
         data: fd,
@@ -286,9 +286,6 @@ var tet = $.ajax({
         success: function (response) {
         $("html").html(response);  
 	$('#file-upload-content').hide();
-console.log("here");
-          //data = JSON.parse(response)
-          //result(data)
         },
         error: function (error) {          
 $('#error').html(error);
