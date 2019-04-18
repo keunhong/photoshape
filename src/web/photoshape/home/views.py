@@ -262,6 +262,7 @@ opts={'title': 'sil-flow-applied'})
         imsave('/projects/grail/photoshapenb/xuyf/photoshape/src/web/photoshape/images/crf/'+filename, crf_seg_vis)
         indices = np.unique(crf_seg_map)[1:]
         context = {'filename' : filename}
+        parts = {}
         for idx in indices:
             #new_img = np.zeros(crf_seg_map.shape)
             new_img = (crf_seg_map == idx)*225
@@ -272,8 +273,11 @@ opts={'title': 'sil-flow-applied'})
             materials = infer_results(original_path, mask_path)
             r, g, b = QUAL_COLORS[idx]
             color = 'rgb('+str(r)+','+str(g)+','+str(b)+')'
-            context[color] = materials
-        return HttpResponse(json.dumps(context))
+            parts[color] = materials
+        context['materials'] = parts
+        html = render_to_string('step3.html', context)
+        return HttpResponse(html)
+
 
     return HttpResponse("fail")
 
@@ -295,7 +299,7 @@ def display_results2(request):
                 form.instance.computed_materials.add(m)
             context['materials'] = materials
             context['form'] = form.instance.pk
-            return HttpResponse(json.dumps(context))
+            html = render_to_string('step2.html', json.dumps(context))
         else:
             print(form.errors)
             print(form.non_field_errors())
@@ -347,7 +351,7 @@ def display_results(request):
                 r, g, b = QUAL_COLORS[idx]
                 c_materials.append((material, 'rgb('+str(r)+','+str(g)+','+str(b)+')'))
         
-            html = render_to_string('models.html', {'models': [(s_id, phi, theta, mesh.bounding_size())], 'g_materials': g_materials, 'c_materials': c_materials, 'url':form.instance.original.url, 'name':original})
+            html = render_to_string('step2.html', {'models': [(s_id, phi, theta, mesh.bounding_size())], 'g_materials': g_materials, 'c_materials': c_materials, 'url':form.instance.original.url, 'name':original})
     
         else:
             print(form.errors)

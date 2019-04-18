@@ -2,8 +2,59 @@
 {% block content %}
 
 
-<div class="file-upload">
 
+
+<div class="file-upload" id="background">
+
+
+
+<!-- Horizontal Steppers -->
+<div class="row">
+  <div class="col-md-12">
+
+    <!-- Stepers Wrapper -->
+    <ul class="stepper stepper-horizontal">
+
+      <!-- First Step -->
+      <li class="active" id="first-step">
+        <a href="#!">
+          <span class="circle">1</span>
+          <span class="label">First step</span>
+        </a>
+      </li>
+
+      <!-- Second Step -->
+      <li class="warning" id="second-step">
+        <a href="#!">
+          <span class="circle"><i class="fas fa-exclamation"></i></span>
+          <span class="label">Second step</span>
+        </a>
+      </li>
+
+      <!-- Third Step -->
+      <li class="warning" id="third-step">
+        <a href="#!">
+          <span class="circle"><i class="fas fa-exclamation"></i></span>
+          <span class="label">Third step</span>
+        </a>
+      </li>
+
+    </ul>
+    <!-- /.Stepers Wrapper -->
+
+  </div>
+</div>
+<!-- /.Horizontal Steppers -->
+<div id="load" style="display: none">
+<div>
+<div class="loader"></div>
+</div>
+ <p id="loader-text">Loading...(it might take around 20s)<p>
+</div> 
+
+<h2 id="error" style="display:none; color:red"></h2>
+<div id="steps">
+<div id="step1-block">
       <button class="file-upload-btn" type="button" onclick="$('.file-upload-input').trigger( 'click' )">Add Image</button>
     <div class="image-upload-wrap">
     {% if content %}
@@ -25,9 +76,11 @@
 </div>
 
 <button id="crop-btn" style="display:none" class="file-upload-btn" type="button" onclick="showCropped();">Go</button>
+</div><!-- step1-block -->
+</div><!-- steps -->
 </div>
-<h2 id="load" style="display:none">Loading...(it might take around 20s)</h2>
-<h2 id="error" style="display:none"></h2>
+
+
 <div class="file-upload" id="results">
   <div id="original">
     

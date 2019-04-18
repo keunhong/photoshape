@@ -7,7 +7,7 @@
 
     <body>
     {% block content %}{% endblock content %}
-<div class="container" style="text-align:center">
+<div class="container" id="copyright">
         <p class="legal-info-text">Copyright <span class="font-family-base-sans-serif">©<strong></strong></span><strong> 2019 Yifan Xu. All rights reserved.</strong> <span class="font-family-base-sans-serif">®</span></p>
     </div>
     </body>
@@ -15,14 +15,56 @@
 </html>
 
 {% load staticfiles %}
-
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 <link rel="stylesheet" type="text/css" href="{% static '/homepage.css' %}" />
 <link rel="stylesheet" type="text/css" href="{% static '/croppie.css' %}" />
+<!-- Stepper CSS -->
+<link rel="stylesheet" type="text/css" href="{% static '/MDB/css/mdb.css' %}" />
+<!-- Stepper CSS - minified-->
+<link rel="stylesheet" type="text/css" href="{% static '/MDB/css/mdb.min.css' %}" />
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 <script class="jsbin" src="https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
 <script src={% static '/croppie.js' %}></script>
 <script src={% static '/homepage.js' %}></script>
 <script src={% static '/three.js' %}></script>
 <script src={% static  '/OBJLoader.js' %}></script>
 
+<!-- Stepper JavaScript -->
+<script  src={% static '/MDB/js/mdb.js' %}></script>
+<!-- Stepper JavaScript - minified -->
+<script  src={% static '/MDB/js/mdb.min.js' %}></script>
 
 
+<style>
+h1 {margin-top: 2rem !important; margin-bottom: 30px}
+ .loader {
+  border: 16px solid #f3f3f3; /* Light grey */
+  border-top: 16px solid #3498db; /* Blue */
+  border-radius: 50%;
+  width: 120px;
+  height: 120px;
+  animation: spin 2s linear infinite;
+}
+#load {
+  display: flex;
+  align-items: center;
+  justify-content: center
+}
+#loader-text {
+  padding: 40px;
+  font-size: 1.5rem;
+  font-weight: bolder
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+.accordion {text-align: center}
+canvas { 500px; height: 500px }
+#copyright {
+  text-align:center;
+  padding: 30px;
+}
+</style>

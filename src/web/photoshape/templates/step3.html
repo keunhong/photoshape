@@ -1,0 +1,61 @@
+
+  <div style="display:none" id="infer_results"><h2>Materials:</h2></div>
+
+
+<div id="step3-block">
+  <!-- Accordion card -->
+  <div class="card">
+
+    <!-- Card header -->
+    <div class="card-header" role="tab" id="heading4">
+      <a class="collapsed" data-toggle="collapse" data-parent="#accordionEx" href="#collapse4"
+        aria-expanded="false" aria-controls="collapse4">
+        <h5 class="mb-0">
+          Model <i class="fas fa-angle-down rotate-icon"></i>
+        </h5>
+      </a>
+    </div>
+
+    <!-- Card body -->
+    <div id="collapse4" class="collapse" role="tabpanel" aria-labelledby="heading4" data-parent="#accordionEx">
+      <div class="card-body">
+           <div id="crf"><img src="/images/crf/{{ filename }}" alt="your image" /></div>
+      </div>
+    </div>
+
+  </div>
+  <!-- Accordion card -->
+{% for key, value in materials.items %}
+  <!-- Accordion card -->
+  <div class="card">
+
+    <!-- Card header -->
+    <div class="card-header" role="tab" id="heading{{ forloop.counter|add:4 }}">
+      <a class="collapsed" data-toggle="collapse" data-parent="#accordionEx" href="#collapse{{ forloop.counter|add:4 }}"
+        aria-expanded="false" aria-controls="collapse{{ forloop.counter|add:4 }}">
+        <h5 class="mb-0" style="color: {{ key }}">
+          Part {{ forloop.counter }} <i class="fas fa-angle-down rotate-icon"></i>
+        </h5>
+      </a>
+    </div>
+
+    <!-- Card body -->
+    <div id="collapse{{ forloop.counter|add:4 }}" class="collapse" role="tabpanel" aria-labelledby="heading{{ forloop.counter|add:4 }}" data-parent="#accordionEx">
+      <div class="card-body">
+        <div id="part{{ forloop.counter }}" style="display:inline-block">
+	   {% for id, name in value %}
+	   <div class="res_container">
+	     <label for="{{ id }}">{{ name }}</label>
+	     <img class="res_img" id="{{ id }}" src="/images/materials/{{ id }}/images/previews/bmps.png">Material{{ id }}</img>
+	   </div>
+	   {% endfor %}
+	</div>
+      </div>
+    </div>
+
+  </div>
+  <!-- Accordion card -->
+{% endfor %}
+</div> <!-- step3-block -->
+
+

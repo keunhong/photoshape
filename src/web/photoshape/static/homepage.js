@@ -5,7 +5,6 @@
 // });
 var outlineImage = new Image();
 var croppedImage;
-
 $uploadCrop = $('#upload-image').croppie({
         viewport: {
             width: 500,
@@ -44,17 +43,29 @@ $uploadCrop = $('#upload-image').croppie({
     });
 
 
+
 function result(data){
   
-  var results = document.getElementById("infer_results");
+  var results = document.getElementById("accordionEx");
 var count = 1;
   for (var idx in data) {
       if (idx != 'filename') {
       ids = data[idx]
-      var part = document.createElement("div")
-      part.className = "part"
+      var card = document.createElement("div")
+      card.className = "card"
+      var header = "<div class='card-header' role='tab' id='headingOne"+count+"'> " +
+      "<a data-toggle='collapse' data-parent='#accordionEx' href='#collapseOne"+count+"' aria-expanded='true' aria-controls='collapseOne"+count+"'> " +
+        "<h5 class='mb-0'> "+
+          "Part "+count+" <i class='fas fa-angle-down rotate-icon'></i> "+
+        "</h5> " +
+      "</a> "+
+    "</div>"
+      card.innerHTML = header
+
+      var body = document.createElement("div")
       part.id = "part"+count
       part.style.display = 'inline-block';
+
       var title = document.createElement("h3")
       title.textContent = "part "+count
       title.style.backgroundColor = idx;
@@ -259,19 +270,18 @@ function showCropped() {
               size: 'viewport',
 
           }).then(function (rawcanvas) {
-    $('#file-upload-content').hide();
     $('#cropped').html(rawcanvas);
-    $('#crop-btn').hide()
+    $('#step1-block').hide()
+    $('#load').show();
     $(rawcanvas).attr('id', 'canvas');
-infer();
+    infer();
   });
     
 }
 function infer() {
     var fd = new FormData();
     var filename = document.getElementById('image-title-wrap').innerHTML;
-     document.getElementById('canvas').toBlob(function(blob) {
-        maskImage = blob;
+    document.getElementById('canvas').toBlob(function(blob) {
 
     fd.append('original', croppedImage, filename);
     fd.append('csrfmiddlewaretoken', getCookie('csrftoken'));
@@ -284,8 +294,12 @@ function infer() {
         enctype: 'multipart/form-data',
         processData: false,
         success: function (response) {
-        $("html").html(response);  
+	//$("html").html(response);
+        $('#load').hide();
+        $('#steps').append(response);  
 	$('#file-upload-content').hide();
+
+        loadModels();
         },
         error: function (error) {          
 $('#error').html(error);

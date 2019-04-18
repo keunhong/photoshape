@@ -1,46 +1,86 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Photoshape</title>
-        <h1>Photoshape</h1>
-    </head>
-    <body>
 
-			<style>
-					canvas { 500px; height: 500px }
-				</style>
-<div class="file-upload">
-<button id="again" style="display:none" class="file-upload-btn" type="button" onclick='back()'>Start again</button>
-<button id="get_materials" class="file-upload-btn" type="button" style="display:none" onclick='submit_g()'>Get materials</button>
-</div>	
-<div id="images" style="text-align: center">
-  <div id="originalImg"> </div>
+<!--Accordion wrapper-->
+<div class="accordion md-accordion" id="accordionEx" role="tablist" aria-multiselectable="true">
   <div id="models" style="display:none"></div>
-  <div id="color"><h2>Your 2D model:</h2></div>
-  <div id="3Dmodel"><h2>Your 3D model:</h2></div>
-  <h2 id="load" style="display:none">Loading...</h2>
-  <div id="error"><div>
-  <div id="crf"></div>
-  <div style="display:none" id="infer_results"><h2>Materials:</h2></div>
-</div>
-<div class="container" style="text-align:center">
-        <p class="legal-info-text">Copyright <span class="font-family-base-sans-serif">©<strong></strong></span><strong> 2019 Yifan Xu. All rights reserved.</strong> <span class="font-family-base-sans-serif">®</span></p>
-    </div>
-</body>
+  <!-- Accordion card -->
+  <div class="card">
 
-	</html>
-	
-	{% load staticfiles %}
-	
-	<link rel="stylesheet" type="text/css" href="{% static '/homepage.css' %}" />
-	<link rel="stylesheet" type="text/css" href="{% static '/croppie.css' %}" />
-	<script class="jsbin" src="https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
-	<script src={% static '/croppie.js' %}></script>
-	<script src={% static '/homepage.js' %}></script>
-	<script src={% static '/three.js' %}></script>
-	<script src={% static  '/OBJLoader.js' %}></script>
-	<script>
+    <!-- Card header -->
+    <div class="card-header" role="tab" id="headingOne1">
+      <a data-toggle="collapse" data-parent="#accordionEx" href="#collapseOne1" aria-expanded="true"
+        aria-controls="collapseOne1">
+        <h5 class="mb-0">
+          Original Image <i class="fas fa-angle-down rotate-icon"></i>
+        </h5>
+      </a>
+    </div>
+
+    <!-- Card body -->
+    <div id="collapseOne1" class="collapse show" role="tabpanel" aria-labelledby="headingOne1" data-parent="#accordionEx">
+      <div class="card-body">
+        <div id="originalImg"><img id="original" src="{{ url }}" alt="your image" /></div>
+      </div>
+    </div>
+
+  </div>
+  <!-- Accordion card -->
+<div id="step2-block">
+  <!-- Accordion card -->
+  <div class="card">
+
+    <!-- Card header -->
+    <div class="card-header" role="tab" id="headingTwo2">
+      <a class="collapsed" data-toggle="collapse" data-parent="#accordionEx" href="#collapseTwo2"
+        aria-expanded="false" aria-controls="collapseTwo2">
+        <h5 class="mb-0">
+          2D Model <i class="fas fa-angle-down rotate-icon"></i>
+        </h5>
+      </a>
+    </div>
+
+    <!-- Card body -->
+    <div id="collapseTwo2" class="collapse" role="tabpanel" aria-labelledby="headingTwo2" data-parent="#accordionEx">
+      <div class="card-body">
+         <div id="color"></div>
+      </div>
+    </div>
+
+  </div>
+  <!-- Accordion card -->
+
+  <!-- Accordion card -->
+  <div class="card">
+
+    <!-- Card header -->
+    <div class="card-header" role="tab" id="headingThree3">
+      <a class="collapsed" data-toggle="collapse" data-parent="#accordionEx" href="#collapseThree3"
+        aria-expanded="false" aria-controls="collapseThree3">
+        <h5 class="mb-0">
+          3D Model <i class="fas fa-angle-down rotate-icon"></i>
+        </h5>
+      </a>
+    </div>
+
+    <!-- Card body -->
+    <div id="collapseThree3" class="collapse" role="tabpanel" aria-labelledby="headingThree3" data-parent="#accordionEx">
+      <div class="card-body">
+        <div id="3Dmodel"></div> 
+      </div>
+    </div>
+
+  </div>
+  <!-- Accordion card -->
+</div> <!-- step2-block -->
+</div>
+<!-- Accordion wrapper -->
+<button id="material-btn" style="display:none" class="file-upload-btn" type="button" onclick="submit_g();">Next</button>
+<button id="again" style="display:none" class="file-upload-btn" type="button" onclick='back()'>Start again</button>
+
+<script>
 	  function loadModels() {
+	  $('#second-step').removeClass("warning").addClass("active");
+	  $("#second-step > a > .circle").html("2"); 
+	  $('#material-btn').show();
 		var camera = new THREE.PerspectiveCamera( 50,  1, 0.1, 5000 );
 		var scene = new THREE.Scene();
 		var scene2 = new THREE.Scene();
@@ -51,10 +91,10 @@
 		document.getElementById("models").appendChild( renderer.domElement );
 		$(renderer.domElement).attr('id', 'grayscale');
 		var renderer2 = new THREE.WebGLRenderer();
-		renderer2.setSize(  1000, 1000 );
+		renderer2.setSize(  500, 500 );
 		document.getElementById("color").appendChild( renderer2.domElement );
 		var renderer3 = new THREE.WebGLRenderer();
-		renderer3.setSize(  1000, 1000 );
+		renderer3.setSize(  500, 500 );
 		document.getElementById("3Dmodel").appendChild( renderer3.domElement );
 			
 		var ambient = new THREE.AmbientLight( 0x333333 );
@@ -72,6 +112,10 @@
 		var materials_g = [];
 		var materials_c = [];
 {% for id, phi, theta, bounding in models %}
+console.log({{ id }})
+console.log({{ phi }})
+console.log({{ theta }})
+console.log({{ bounding }})
   files = '/static/blobs/shapes/'+{{ id }}+'/models/uvmapped_v2.obj';
   elevations = {{ phi }};
   azimuths = {{ theta }};
@@ -84,10 +128,8 @@
 {% for material, c in c_materials%}
   materials_c.push(['{{ material }}', new THREE.MeshBasicMaterial({ color: '{{ c }}', side: THREE.DoubleSide })] );
 {% endfor %}
-
 function animate() {
     renderer.render( scene, camera );
-    $('#get_materials').show();
 };
 
 function animate2() {
@@ -112,7 +154,7 @@ function animate2() {
 			model.scale.y *= (1 / bounding);
 			model.scale.z *= (1 / bounding);	
 			model.rotation.y += azimuths-0.5*Math.PI;
-			model.rotation.x += 0.5*Math.PI - elevations+0.1;
+			model.rotation.x += 0.5*Math.PI - elevations;
 			animate();
 		    },
 		    function ( xhr ) {
@@ -142,7 +184,7 @@ function loadNextFile2() {
 		model.scale.y *= (1 / bounding);
 		model.scale.z *= (1 / bounding);     
 		model.rotation.y += azimuths-0.5*Math.PI;
-		model.rotation.x += 0.5*Math.PI - elevations+0.1;
+		model.rotation.x += 0.5*Math.PI - elevations;
 		animate2();
 	},
 		function ( xhr ) {
@@ -167,7 +209,7 @@ function loadNextFile3() {
         model.scale.y *= (1 / bounding);
         model.scale.z *= (1 / bounding);     
         model.rotation.y += azimuths-0.5*Math.PI;
-        model.rotation.x += 0.5*Math.PI - elevations+0.1;
+        model.rotation.x += 0.5*Math.PI - elevations;
         renderer3.render(scene3, camera);          
     },
     function ( xhr ) {
@@ -179,8 +221,6 @@ function loadNextFile3() {
      });
  }
 
-
-
 		var objLoader = new THREE.OBJLoader();
 		var objLoader2 = new THREE.OBJLoader();
 		var objLoader3 = new THREE.OBJLoader();
@@ -189,16 +229,10 @@ function loadNextFile3() {
 		loadNextFile3();
 		camera.position.z = 2;
 }
-loadModels();
 var submit_g = function() {
     var grayscaleImg;
     var fd = new FormData();
     $('#load').show();
-    $('#color').hide();
-    $('#3Dmodel').hide();
-$('#get_materials').hide();
-    var text = "<h2>Your image:</h2><img id='original' src=" + '{{ url }}' + " alt='your image' />"
-    $('#originalImg').html(text)
     var filename = '{{ name }}'
     document.getElementById('grayscale').toBlob(function(blob) {
         grayscaleImage = blob;
@@ -206,6 +240,9 @@ $('#get_materials').hide();
         fd.append('grayscale', grayscaleImage, 'grayscale-'+filename);
         fd.append('csrfmiddlewaretoken', getCookie('csrftoken'));
 	fd.append('url', '{{ url }}');
+        $('#step2-block').hide();
+        $('#accordionEx').hide();
+        $('#material-btn').hide();
         var tet = $.ajax({
             url: '/models/',
             type: 'POST',
@@ -215,13 +252,12 @@ $('#get_materials').hide();
             enctype: 'multipart/form-data',
             processData: false,
             success: function (response) {
-              data = JSON.parse(response)
               $('#load').hide();
-              $('#infer_results').show();
+	      $('#accordionEx').show();
+	      $('#accordionEx').append(response); 
+	      $('#third-step').removeClass("warning").addClass("active");
+	      $("#third-step > a > .circle").html("3");  
               $('#again').show();
-              var text = "<h2>Your model:</h2><img id='crf' src='/images/crf/"+ data['filename'] + "' alt='your image' />"
-    $('#crf').html(text)
-              result(data);
             },
             error: function (error) {
               $('#load').hide();
@@ -232,6 +268,4 @@ $('#get_materials').hide();
 
     }, 'image/png', 1);
 }
-		</script>
-
-
+</script>
